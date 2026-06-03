@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Simple</title>
+    <style>
+        body { background: #0b0b0f; color: white; font-family: Arial; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #FFD700; padding: 8px; text-align: left; }
+        th { background: #FFD700; color: black; }
+    </style>
+</head>
+<body>
+    <h1>Admin Verifikasi Aspirasi</h1>
+    <div id="result">Loading...</div>
+    
+    <script>
+        async function loadData() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                // Ganti URL ini sesuai API yang berfungsi
+                const res = await fetch('/demustar/api/aspirasi.php');
+                const data = await res.json();
+                
+                console.log('Data:', data);
+                
+                if (data.ok && data.data) {
+                    let html = '<table><thead><tr>';
+                    html += '<th>No</th><th>Tanggal</th><th>Nama</th><th>Kategori</th><th>Aspirasi</th><th>Status</th>';
+                    html += '</thead><tbody>';
+                    
+                    data.data.forEach((item, index) => {
+                        html += `<tr>
+                            <td>${index + 1}</td>
+                            <td>${item.tanggal || '-'}</td>
+                            <td>${item.nama || '-'}</td>
+                            <td>${item.kategori || '-'}</td>
+                            <td>${item.isi ? item.isi.substring(0, 50) : '-'}${item.isi && item.isi.length > 50 ? '...' : ''}</td>
+                            <td>${item.status || '-'}</td>
+                        </tr>`;
+                    });
+                    
+                    html += '</tbody></table>';
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = '<p>Error: ' + (data.message || 'Unknown') + '</p>';
+                }
+            } catch(err) {
+                resultDiv.innerHTML = '<p>Error: ' + err.message + '</p>';
+            }
+        }
+        
+        loadData();
+    </script>
+</body>
+</html>

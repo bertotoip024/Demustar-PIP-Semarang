@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Verifikasi | DEMUSTAR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..800&family=Manrope:wght@300..800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0b0f;
+            --bg2: #131318;
+            --surface: rgba(20, 20, 28, 0.85);
+            --surface2: rgba(30, 30, 38, 0.9);
+            --gold: #FFD700;
+            --gold-faint: rgba(255, 215, 0, 0.08);
+            --green: #88d982;
+            --blue: #4f8cff;
+            --red: #ff5a7a;
+            --text: #f5e6c8;
+            --muted: rgba(245, 230, 200, 0.7);
+            --muted2: rgba(245, 230, 200, 0.5);
+            --line: rgba(255, 215, 0, 0.12);
+            --shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            --radius: 16px;
+            --radius-lg: 24px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Manrope', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            font-size: 14px;
+        }
+        .bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; animation: float 20s infinite ease-in-out; }
+        .o1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(255, 215, 0, 0.45), transparent); top: -150px; left: -150px; }
+        .o2 { width: 450px; height: 450px; background: radial-gradient(circle, rgba(255, 215, 0, 0.4), transparent); bottom: -100px; right: -100px; animation-delay: -5s; }
+        .o3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(255, 215, 0, 0.35), transparent); top: 40%; left: 70%; animation-delay: -10s; }
+        @keyframes float { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px, -30px) scale(1.05); } }
+        .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,215,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,215,0,0.03) 1px, transparent 1px); background-size: 50px 50px; }
+        
+        /* Topbar - Center Navbar */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px;
+            background: rgba(11, 11, 15, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--line);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .brand-logos {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .brand-logos img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,.18);
+            background: rgba(255,215,0,.05);
+            padding: 2px;
+        }
+        .brand-title {
+            font-family: 'Newsreader', serif;
+            font-style: italic;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 0.5px;
+        }
+        .brand-subtitle {
+            font-size: 8px;
+            color: var(--muted2);
+            letter-spacing: 0.3px;
+        }
+        .topnav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.03);
+            padding: 4px 10px;
+            border-radius: 40px;
+            border: 1px solid var(--line);
+            flex: 1;
+            margin: 0 15px;
+        }
+        .topnav a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 40px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .topnav a:hover, .topnav a.active {
+            color: var(--gold);
+            background: var(--gold-faint);
+        }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 40px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255,215,0,0.2);
+        }
+        .logout-btn {
+            background: rgba(255,90,122,0.2);
+            border: 1px solid var(--red);
+            color: var(--red);
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        .logout-btn:hover { background: rgba(255,90,122,0.4); }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 40px;
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            color: #1a1a1a;
+            font-weight: 800;
+            text-decoration: none;
+            font-size: 11px;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,215,0,0.3); }
+        
+        .tab-nav { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+        .tab-btn { background: transparent; border: none; color: var(--muted); font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 40px; cursor: pointer; transition: all 0.2s; }
+        .tab-btn:hover { color: var(--gold); background: var(--gold-faint); }
+        .tab-btn.active { background: var(--gold); color: #1a1a1a; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .page { max-width: 1200px; margin: 0 auto; padding: 20px 20px 40px; position: relative; z-index: 1; }
+        .hero { text-align: center; padding: 30px 20px; background: radial-gradient(ellipse at 50% 0%, rgba(255,215,0,0.08), transparent 60%); border-radius: var(--radius-lg); margin-bottom: 30px; }
+        .hero-badge { display: inline-block; padding: 4px 12px; border-radius: 40px; background: var(--gold-faint); border: 1px solid rgba(255,215,0,0.2); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+        .hero h1 { font-family: 'Newsreader', serif; font-style: italic; font-size: 28px; margin-bottom: 8px; }
+        .hero h1 .gold { color: var(--gold); }
+        .hero-desc { font-size: 12px; color: var(--muted); max-width: 550px; margin: 0 auto; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 24px 0; }
+        @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr; } }
+        .stat-card { background: var(--surface2); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; text-align: center; transition: all 0.3s; }
+        .stat-card:hover { transform: translateY(-4px); border-color: var(--gold); }
+        .stat-number { font-size: 32px; font-weight: 800; color: var(--gold); font-family: 'Newsreader', serif; }
+        .stat-label { font-size: 10px; color: var(--muted2); text-transform: uppercase; letter-spacing: 1px; }
+        
+        .card-section { background: var(--surface); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 24px; }
+        .section-title { font-family: 'Newsreader', serif; font-style: italic; font-size: 18px; font-weight: 700; margin-bottom: 16px; border-left: 4px solid var(--gold); padding-left: 12px; }
+        .vote-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        @media (max-width: 900px) { .vote-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .vote-grid { grid-template-columns: 1fr; } }
+        .vote-card { background: var(--surface2); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; text-align: center; position: relative; transition: all 0.3s; }
+        .vote-card:hover { transform: translateY(-4px); border-color: var(--gold); }
+        .vote-card.rank1 { border: 2px solid var(--gold); background: rgba(255,215,0,0.05); }
+        .rank-badge { position: absolute; top: -10px; left: 16px; background: var(--gold); color: #1a1a1a; padding: 2px 10px; border-radius: 20px; font-size: 10px; }
+        .vote-card h4 { margin: 10px 0 4px; color: var(--gold); font-size: 14px; }
+        .vote-count { font-size: 22px; font-weight: bold; color: var(--gold); margin-top: 6px; }
+        
+        .filter-section { background: var(--surface); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 20px; }
+        .filter-buttons { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+        .filter-btn { padding: 6px 16px; border: 1px solid var(--line); border-radius: 40px; cursor: pointer; background: transparent; color: var(--muted); font-weight: 600; font-size: 11px; }
+        .filter-btn.active, .filter-btn:hover { background: var(--gold); color: #1a1a1a; }
+        .btn-load { background: var(--gold); border: none; padding: 6px 18px; border-radius: 40px; cursor: pointer; font-weight: bold; color: #1a1a1a; font-size: 11px; }
+        
+        .table-wrapper { background: var(--surface); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: rgba(255,215,0,0.08); color: var(--gold); padding: 10px; text-align: left; font-weight: 700; font-size: 11px; }
+        td { padding: 8px 10px; border-bottom: 1px solid var(--line); font-size: 11px; }
+        tr:hover { background: var(--gold-faint); }
+        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; }
+        .status-pending { background: rgba(255,90,122,0.2); color: var(--red); }
+        .status-proses { background: rgba(79,140,255,0.2); color: var(--blue); }
+        .status-selesai { background: rgba(136,217,130,0.2); color: var(--green); }
+        .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+        .action-btns button { background: none; border: none; font-size: 10px; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.2s; font-weight: 600; }
+        .action-btns button:hover { transform: translateY(-1px); }
+        .btn-proses { background: rgba(136,217,130,0.2); color: var(--green); border: 1px solid var(--green) !important; }
+        .btn-selesai { background: rgba(79,140,255,0.2); color: var(--blue); border: 1px solid var(--blue) !important; }
+        .btn-hapus { background: rgba(255,90,122,0.2); color: var(--red); border: 1px solid var(--red) !important; }
+        .btn-detail { background: rgba(255,215,0,0.2); color: var(--gold); border: 1px solid var(--gold) !important; }
+        
+        .footer { border-top: 1px solid var(--line); background: rgba(11,11,15,0.8); margin-top: 40px; padding: 24px 0; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .footer-links { display: flex; gap: 20px; }
+        .footer-links a { color: var(--muted2); text-decoration: none; font-size: 10px; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--gold); }
+        .footer-copy { font-size: 9px; color: var(--muted2); }
+        
+        .loading { text-align: center; padding: 30px; color: var(--muted); font-size: 12px; }
+        .empty-data { text-align: center; padding: 30px; color: var(--muted2); font-size: 12px; }
+        
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 12px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            transform: translateX(400px);
+        }
+        
+        .access-denied {
+            text-align: center;
+            padding: 80px 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .access-denied h1 {
+            font-size: 36px;
+            color: var(--red);
+            margin-bottom: 16px;
+        }
+        .access-denied p {
+            color: var(--muted);
+            margin-bottom: 24px;
+            font-size: 13px;
+        }
+        .access-denied .btn-back {
+            display: inline-block;
+            padding: 10px 24px;
+            background: var(--gold);
+            color: #1a1a1a;
+            text-decoration: none;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 900px) {
+            .topbar { flex-direction: column; align-items: center; justify-content: center; padding: 10px 16px; }
+            .topnav { width: 100%; justify-content: center; overflow-x: auto; margin: 8px 0; }
+            .topnav a { white-space: nowrap; }
+            .topbar-actions { justify-content: center; margin-top: 5px; }
+            .hero h1 { font-size: 24px; }
+            .tab-btn { padding: 6px 12px; font-size: 12px; }
+            .action-btns button { font-size: 9px; padding: 3px 6px; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div class="grid"></div></div>
+
+<!-- Main Content - Akan ditampilkan jika user adalah admin -->
+<div id="adminContent" style="display: none;">
+    <header class="topbar">
+        <a class="brand" href="../index.html">
+            <div class="brand-logos">
+                <img src="../assets/logo-demustar.png" alt="DEMUSTAR"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2218%22 fill=%22none%22 stroke=%22%23FFD700%22 stroke-width=%222%22/%3E%3Ctext x=%2220%22 y=%2225%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22%23FFD700%22%3ED%3C/text%3E%3C/svg%3E'">
+                <img src="../assets/logo-pip.png" alt="PIP Semarang"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2218%22 fill=%22none%22 stroke=%22%23FFD700%22 stroke-width=%222%22/%3E%3Ctext x=%2220%22 y=%2225%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22%23FFD700%22%3EP%3C/text%3E%3C/svg%3E'">
+            </div>
+            <div class="brand-text">
+                <div class="brand-title">DEMUSTAR</div>
+                <div class="brand-subtitle">Dewan Musyawarah Taruna PIP Semarang</div>
+            </div>
+        </a>
+        <nav class="topnav">
+            <a href="../index.html">Beranda</a>
+            <a href="../aspirasi.html">DEM BOX</a>
+            <a href="../prestasi.html">Prestasi</a>
+            <a href="../demclass.html">DEM CLASS</a>
+            <a href="../index.html#tentang">Tentang</a>
+            <a href="../index.html#visi">Visi & Misi</a>
+            <a href="../pemilihan.html">Pemilihan</a>
+        </nav>
+        <div class="topbar-actions">
+            <div class="user-btn"><span class="dot"></span><span>Halo,</span><b id="userNameDisplay">Admin</b><button class="logout-btn" id="logoutBtn">Logout</button></div>
+            <a class="btn-primary" href="../aspirasi.html#kirim-aspirasi">+ Kirim ke DEM BOX</a>
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="hero"><span class="hero-badge">ADMIN DASHBOARD</span><h1>✅ Admin <span class="gold">Verifikasi</span></h1><p class="hero-desc">Kelola aspirasi, prestasi & pantau hasil pemilihan Top 4 Taruna PIP Semarang</p></section>
+        
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><div class="stat-number" id="statTotalAspirasi">0</div><div class="stat-label">TOTAL ASPIRASI</div></div>
+            <div class="stat-card"><div class="stat-number" id="statTotalPrestasi">0</div><div class="stat-label">TOTAL PRESTASI</div></div>
+            <div class="stat-card"><div class="stat-number" id="statTotalVote">0</div><div class="stat-label">TOTAL VOTE</div></div>
+            <div class="stat-card"><div class="stat-number" id="statTotalUser">0</div><div class="stat-label">TOTAL USER</div></div>
+        </div>
+        
+        <div class="card-section">
+            <div class="section-title">🏆 Hasil Pemilihan Top 4</div>
+            <div class="vote-grid" id="voteResults"><div class="loading">Memuat hasil pemilihan...</div></div>
+        </div>
+        
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="aspirasi">📋 Aspirasi</button>
+            <button class="tab-btn" data-tab="prestasi">🏅 Prestasi</button>
+        </div>
+        
+        <div id="tab-aspirasi" class="tab-content active">
+            <div class="filter-section">
+                <div class="section-title">📌 Filter Aspirasi</div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-status="all">Semua</button>
+                    <button class="filter-btn" data-status="pending">Pending</button>
+                    <button class="filter-btn" data-status="proses">Diproses</button>
+                    <button class="filter-btn" data-status="selesai">Selesai</button>
+                    <button class="btn-load" id="loadAspirasiBtn">🔄 Muat Data</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>No</th><th>Tanggal</th><th>Nama/NIT</th><th>Kategori</th><th>Aspirasi</th><th>Status</th><th>Aksi</th></tr></thead>
+                    <tbody id="aspirasiTableBody"><tr><td colspan="7" class="loading">Memuat data...</div></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="tab-prestasi" class="tab-content">
+            <div class="filter-section">
+                <div class="section-title">📌 Filter Prestasi</div>
+                <div class="filter-buttons">
+                    <button class="filter-btn prestasi-filter active" data-status="all">Semua</button>
+                    <button class="filter-btn prestasi-filter" data-status="pending">Pending</button>
+                    <button class="filter-btn prestasi-filter" data-status="proses">Diproses</button>
+                    <button class="filter-btn prestasi-filter" data-status="selesai">Selesai</button>
+                    <button class="btn-load" id="loadPrestasiBtn">🔄 Muat Data</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>No</th><th>Tanggal</th><th>Nama</th><th>Kelas</th><th>NIT</th><th>Tingkat</th><th>Deskripsi</th><th>Status</th><th>Aksi</th></tr>
+                    </thead>
+                    <tbody id="prestasiTableBody"><tr><td colspan="9" class="loading">Memuat data...</div></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer"><div class="footer-inner"><span class="footer-title">DEMUSTAR</span><div class="footer-links"><a href="#">TENTANG KAMI</a><a href="#">KEBIJAKAN PRIVASI</a><a href="#">KONTAK</a></div><p class="footer-copy">© 2026 DEMUSTAR. ALL RIGHTS RESERVED.</p></div></footer>
+</div>
+
+<!-- Access Denied -->
+<div id="accessDenied" class="access-denied" style="display: none;">
+    <div>
+        <h1>⛔ Akses Ditolak</h1>
+        <p>Halaman ini hanya dapat diakses oleh Administrator.<br>Silakan login dengan akun admin untuk mengakses halaman ini.</p>
+        <a href="../index.html" class="btn-back">← Kembali ke Beranda</a>
+    </div>
+</div>
+
+<script>
+    let aspirasiData = [];
+    let prestasiData = [];
+    let currentAspirasiFilter = 'all';
+    let currentPrestasiFilter = 'all';
+    let currentUser = null;
+    
+    function showToast(type, message) {
+        let toast = document.getElementById('toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            document.body.appendChild(toast);
+        }
+        toast.style.cssText = `position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; border-radius: 8px; background: ${type === 'success' ? '#28a745' : '#dc3545'}; color: white; font-size: 12px; z-index: 1000; transition: all 0.3s ease; transform: translateX(400px);`;
+        toast.textContent = message;
+        toast.style.transform = 'translateX(0)';
+        setTimeout(() => { toast.style.transform = 'translateX(400px)'; }, 3000);
+    }
+    
+    async function checkAdminAccess() {
+        console.log('[ADMIN] Checking admin access...');
+        
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                if (user && user.role === 'admin') {
+                    currentUser = user;
+                    document.getElementById('userNameDisplay').textContent = user.nama || 'Admin';
+                    showAdminContent();
+                    return;
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        const welcomeData = sessionStorage.getItem('demustar_welcome');
+        if (welcomeData) {
+            try {
+                const data = JSON.parse(welcomeData);
+                if (data && data.role === 'admin') {
+                    currentUser = data;
+                    document.getElementById('userNameDisplay').textContent = data.name || 'Admin';
+                    showAdminContent();
+                    return;
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        try {
+            const res = await fetch('/demustar/api/auth/me.php', { credentials: 'same-origin' });
+            const data = await res.json();
+            if (res.ok && data.ok && data.user) {
+                if (data.user.role === 'admin') {
+                    currentUser = data.user;
+                    document.getElementById('userNameDisplay').textContent = data.user.nama || data.user.nit || 'Admin';
+                    localStorage.setItem('user', JSON.stringify({
+                        nama: data.user.nama,
+                        nit: data.user.nit,
+                        tanggal_lahir: data.user.tanggal_lahir,
+                        role: data.user.role
+                    }));
+                    showAdminContent();
+                    return;
+                }
+            }
+        } catch(e) { console.error('API error:', e); }
+        
+        showAccessDenied();
+    }
+    
+    function showAdminContent() {
+        document.getElementById('adminContent').style.display = 'block';
+        document.getElementById('accessDenied').style.display = 'none';
+        loadVoteResults();
+        loadAspirasi();
+        loadPrestasi();
+        loadTotalUsers();
+    }
+    
+    function showAccessDenied() {
+        document.getElementById('adminContent').style.display = 'none';
+        document.getElementById('accessDenied').style.display = 'flex';
+    }
+    
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`tab-${this.dataset.tab}`).classList.add('active');
+        });
+    });
+    
+    async function loadVoteResults() {
+        const voteContainer = document.getElementById('voteResults');
+        if (!voteContainer) return;
+        voteContainer.innerHTML = '<div class="loading">⏳ Memuat hasil pemilihan...</div>';
+        try {
+            const res = await fetch('/demustar/api/hasil_vote.php');
+            const result = await res.json();
+            if (result.ok && result.data) {
+                const top4 = result.data.slice(0, 4);
+                document.getElementById('statTotalVote').textContent = result.total_vote || 0;
+                if (top4.length === 0) {
+                    voteContainer.innerHTML = '<div class="empty-data">📭 Belum ada suara masuk</div>';
+                    return;
+                }
+                voteContainer.innerHTML = top4.map((item, index) => `<div class="vote-card ${index === 0 ? 'rank1' : ''}"><div class="rank-badge">#${index + 1}</div><div style="font-size:32px;">👨‍🎓</div><h4>${item.nama}</h4><div class="vote-count">${item.suara} suara</div></div>`).join('');
+            } else {
+                voteContainer.innerHTML = '<div class="empty-data">❌ Gagal memuat hasil pemilihan</div>';
+            }
+        } catch(e) {
+            voteContainer.innerHTML = '<div class="empty-data">❌ Error: ' + e.message + '</div>';
+        }
+    }
+    
+    async function loadTotalUsers() {
+        try {
+            const res = await fetch('/demustar/api/users.php');
+            const result = await res.json();
+            if (result.ok) document.getElementById('statTotalUser').textContent = result.total || 0;
+        } catch(e) { document.getElementById('statTotalUser').textContent = '?'; }
+    }
+    
+    async function loadAspirasi() {
+        const tbody = document.getElementById('aspirasiTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="7" class="loading">⏳ Memuat data...</div>';
+        try {
+            const res = await fetch('/demustar/api/aspirasi.php');
+            const result = await res.json();
+            if (result.ok && result.data) {
+                aspirasiData = result.data;
+                document.getElementById('statTotalAspirasi').textContent = result.stats?.total || 0;
+                renderAspirasiTable();
+            } else {
+                tbody.innerHTML = '<td><td colspan="7" class="empty-data">❌ Gagal memuat数据</div>';
+            }
+        } catch(e) {
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-data">❌ Error: ${e.message}</div>`;
+        }
+    }
+    
+    function renderAspirasiTable() {
+        const tbody = document.getElementById('aspirasiTableBody');
+        let filtered = aspirasiData;
+        if (currentAspirasiFilter !== 'all') filtered = aspirasiData.filter(a => a.status === currentAspirasiFilter);
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-data">📭 Tidak ada data aspirasi</div>';
+            return;
+        }
+        tbody.innerHTML = filtered.map((item, index) => {
+            let actionButtons = '', statusClass = '', statusText = '';
+            if (item.status === 'pending') {
+                actionButtons = `<button class="btn-proses" onclick="updateAspirasiStatus(${item.id}, 'proses')">✓ Proses</button>`;
+                statusClass = 'status-pending'; statusText = 'Pending';
+            } else if (item.status === 'proses') {
+                actionButtons = `<button class="btn-selesai" onclick="updateAspirasiStatus(${item.id}, 'selesai')">✔ Selesai</button>`;
+                statusClass = 'status-proses'; statusText = 'Diproses';
+            } else {
+                statusClass = 'status-selesai'; statusText = 'Selesai';
+            }
+            actionButtons += `<button class="btn-detail" onclick="viewAspirasiDetail(${item.id})">👁️ Detail</button><button class="btn-hapus" onclick="deleteAspirasi(${item.id})">🗑️ Hapus</button>`;
+            return `<tr><td>${index + 1}</td><td>${item.tanggal || '-'}</td><td>${item.anonim ? '🔒 Anonim' : (item.nama || '-')}</td><td>${item.kategori || '-'}</td><td style="max-width:250px;word-wrap:break-word;">${item.isi ? item.isi.substring(0,70) : '-'}${item.isi && item.isi.length > 70 ? '...' : ''}</td><td><span class="status-badge ${statusClass}">${statusText}</span></td><td class="action-btns">${actionButtons}</div>`;
+        }).join('');
+    }
+    
+    async function updateAspirasiStatus(id, status) {
+        const statusText = status === 'proses' ? 'Diproses' : 'Selesai';
+        if (!confirm(`Ubah status aspirasi menjadi "${statusText}"?`)) return;
+        try {
+            const res = await fetch('/demustar/api/aspirasi.php', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status }) });
+            const result = await res.json();
+            if (result.ok) { showToast('success', `✅ Status berhasil diubah`); await loadAspirasi(); }
+            else { showToast('error', result.message); }
+        } catch(e) { showToast('error', 'Terjadi kesalahan'); }
+    }
+    
+    async function deleteAspirasi(id) {
+        if (!confirm('Yakin ingin menghapus aspirasi ini?')) return;
+        try {
+            const res = await fetch('/demustar/api/aspirasi.php', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+            const result = await res.json();
+            if (result.ok) { showToast('success', '🗑️ Aspirasi dihapus'); await loadAspirasi(); }
+            else { showToast('error', result.message); }
+        } catch(e) { showToast('error', 'Terjadi kesalahan'); }
+    }
+    
+    function viewAspirasiDetail(id) {
+        const item = aspirasiData.find(a => a.id == id);
+        if (item) alert(`📋 DETAIL ASPIRASI\n\nTanggal: ${item.tanggal}\nKategori: ${item.kategori}\nNama: ${item.anonim ? 'Anonim' : item.nama}\nStatus: ${item.status}\n\nISI:\n${item.isi}`);
+    }
+    
+    async function loadPrestasi() {
+        const tbody = document.getElementById('prestasiTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="9" class="loading">⏳ Memuat数据...</div>';
+        try {
+            const res = await fetch('/demustar/api/prestasi.php');
+            const result = await res.json();
+            if (result.ok && result.data) {
+                prestasiData = result.data;
+                document.getElementById('statTotalPrestasi').textContent = result.stats?.total || 0;
+                renderPrestasiTable();
+            } else {
+                tbody.innerHTML = '<td><td colspan="9" class="empty-data">❌ Gagal memuat数据</div>';
+            }
+        } catch(e) {
+            tbody.innerHTML = `<tr><td colspan="9" class="empty-data">❌ Error: ${e.message}</div>`;
+        }
+    }
+    
+    function renderPrestasiTable() {
+        const tbody = document.getElementById('prestasiTableBody');
+        let filtered = prestasiData;
+        if (currentPrestasiFilter !== 'all') filtered = prestasiData.filter(p => p.status === currentPrestasiFilter);
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<td><td colspan="9" class="empty-data">📭 Tidak ada data prestasi</div>';
+            return;
+        }
+        tbody.innerHTML = filtered.map((item, index) => {
+            let actionButtons = '', statusClass = '', statusText = '';
+            if (item.status === 'pending') {
+                actionButtons = `<button class="btn-proses" onclick="updatePrestasiStatus(${item.id}, 'proses')">✓ Proses</button>`;
+                statusClass = 'status-pending'; statusText = 'Pending';
+            } else if (item.status === 'proses') {
+                actionButtons = `<button class="btn-selesai" onclick="updatePrestasiStatus(${item.id}, 'selesai')">✔ Selesai</button>`;
+                statusClass = 'status-proses'; statusText = 'Diproses';
+            } else {
+                statusClass = 'status-selesai'; statusText = 'Selesai';
+            }
+            actionButtons += `<button class="btn-detail" onclick="viewPrestasiDetail(${item.id})">👁️ Detail</button><button class="btn-hapus" onclick="deletePrestasi(${item.id})">🗑️ Hapus</button>`;
+            return `<tr><td>${index + 1}</td><td>${item.created_at ? item.created_at.split(' ')[0] : '-'}</td><td>${item.nama || '-'}</td><td>${item.kelas || '-'}</td><td>${item.nit || '-'}</td><td>${item.tingkat || '-'}</td><td style="max-width:200px;word-wrap:break-word;">${item.deskripsi ? item.deskripsi.substring(0,50) : '-'}${item.deskripsi && item.deskripsi.length > 50 ? '...' : ''}</td><td><span class="status-badge ${statusClass}">${statusText}</span></td><td class="action-btns">${actionButtons}</td></div>`;
+        }).join('');
+    }
+    
+    async function updatePrestasiStatus(id, status) {
+        const statusText = status === 'proses' ? 'Diproses' : 'Selesai';
+        if (!confirm(`Ubah status prestasi menjadi "${statusText}"?`)) return;
+        try {
+            const res = await fetch('/demustar/api/prestasi.php', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status }) });
+            const result = await res.json();
+            if (result.ok) { showToast('success', `✅ Status berhasil diubah`); await loadPrestasi(); }
+            else { showToast('error', result.message); }
+        } catch(e) { showToast('error', 'Terjadi kesalahan'); }
+    }
+    
+    async function deletePrestasi(id) {
+        if (!confirm('Yakin ingin menghapus prestasi ini?')) return;
+        try {
+            const res = await fetch('/demustar/api/prestasi.php', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+            const result = await res.json();
+            if (result.ok) { showToast('success', '🗑️ Prestasi dihapus'); await loadPrestasi(); }
+            else { showToast('error', result.message); }
+        } catch(e) { showToast('error', 'Terjadi kesalahan'); }
+    }
+    
+    function viewPrestasiDetail(id) {
+        const item = prestasiData.find(p => p.id == id);
+        if (item) alert(`📋 DETAIL PRESTASI\n\nTanggal: ${item.created_at}\nNama: ${item.nama}\nKelas: ${item.kelas}\nNIT: ${item.nit}\nTingkat: ${item.tingkat}\nLink: ${item.link_dokumen}\n\nDESKRIPSI:\n${item.deskripsi}\n\nSARAN:\n${item.saran || '-'}`);
+    }
+    
+    document.querySelectorAll('#tab-aspirasi .filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#tab-aspirasi .filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentAspirasiFilter = this.dataset.status;
+            renderAspirasiTable();
+        });
+    });
+    
+    document.querySelectorAll('#tab-prestasi .filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#tab-prestasi .filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentPrestasiFilter = this.dataset.status;
+            renderPrestasiTable();
+        });
+    });
+    
+    document.getElementById('loadAspirasiBtn')?.addEventListener('click', loadAspirasi);
+    document.getElementById('loadPrestasiBtn')?.addEventListener('click', loadPrestasi);
+    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+        fetch('/demustar/api/auth/logout.php', { method: 'POST', credentials: 'same-origin' });
+        sessionStorage.clear();
+        localStorage.clear();
+        window.location.href = '../index.html';
+    });
+    
+    checkAdminAccess();
+</script>
+</body>
+</html>
