@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Role User</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Test Role User</h1>
+    <button onclick="checkRole()">Cek Role</button>
+    <pre id="result"></pre>
+    
+    <script>
+        async function checkRole() {
+            const pre = document.getElementById('result');
+            pre.textContent = 'Loading...';
+            
+            // Cek dari localStorage
+            const userStr = localStorage.getItem('user');
+            pre.textContent += '\n\n=== localStorage ===\n';
+            pre.textContent += userStr || '(kosong)';
+            
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    pre.textContent += '\n\nRole from localStorage: ' + user.role;
+                } catch(e) {}
+            }
+            
+            // Cek dari sessionStorage
+            const welcomeData = sessionStorage.getItem('demustar_welcome');
+            pre.textContent += '\n\n=== sessionStorage ===\n';
+            pre.textContent += welcomeData || '(kosong)';
+            
+            if (welcomeData) {
+                try {
+                    const data = JSON.parse(welcomeData);
+                    pre.textContent += '\n\nRole from sessionStorage: ' + data.role;
+                } catch(e) {}
+            }
+            
+            // Cek dari API
+            try {
+                const res = await fetch('/demustar/api/auth/me.php', { credentials: 'same-origin' });
+                const data = await res.json();
+                pre.textContent += '\n\n=== API /me.php ===\n';
+                pre.textContent += JSON.stringify(data, null, 2);
+            } catch(e) {
+                pre.textContent += '\n\nError API: ' + e.message;
+            }
+        }
+        
+        checkRole();
+    </script>
+</body>
+</html>

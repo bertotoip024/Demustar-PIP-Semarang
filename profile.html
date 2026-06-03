@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Saya • DEMUSTAR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..800&family=Manrope:wght@300..800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0b0f;
+            --bg2: #131318;
+            --surface: rgba(20, 20, 28, 0.85);
+            --surface2: rgba(30, 30, 38, 0.9);
+            --gold: #FFD700;
+            --gold-faint: rgba(255, 215, 0, 0.08);
+            --green: #88d982;
+            --blue: #4f8cff;
+            --red: #ff5a7a;
+            --text: #f5e6c8;
+            --muted: rgba(245, 230, 200, 0.7);
+            --muted2: rgba(245, 230, 200, 0.5);
+            --line: rgba(255, 215, 0, 0.12);
+            --radius: 16px;
+            --radius-lg: 24px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Manrope', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            font-size: 14px;
+        }
+        .bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; animation: float 20s infinite ease-in-out; }
+        .o1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,215,0,0.45), transparent); top: -150px; left: -150px; }
+        .o2 { width: 450px; height: 450px; background: radial-gradient(circle, rgba(255,215,0,0.4), transparent); bottom: -100px; right: -100px; animation-delay: -5s; }
+        .o3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(255,215,0,0.35), transparent); top: 40%; left: 70%; animation-delay: -10s; }
+        @keyframes float { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px, -30px) scale(1.05); } }
+        .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,215,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,215,0,0.03) 1px, transparent 1px); background-size: 50px 50px; }
+        
+        /* Topbar - Center Navbar */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px;
+            background: rgba(11, 11, 15, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--line);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .brand-logos {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .brand-logos img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,.18);
+            background: rgba(255,215,0,.05);
+            padding: 2px;
+        }
+        .brand-title {
+            font-family: 'Newsreader', serif;
+            font-style: italic;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 0.5px;
+        }
+        .brand-subtitle {
+            font-size: 8px;
+            color: var(--muted2);
+            letter-spacing: 0.3px;
+        }
+        .topnav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.03);
+            padding: 4px 10px;
+            border-radius: 40px;
+            border: 1px solid var(--line);
+            flex: 1;
+            margin: 0 15px;
+        }
+        .topnav a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 40px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .topnav a:hover, .topnav a.active {
+            color: var(--gold);
+            background: var(--gold-faint);
+        }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .user-menu { position: relative; }
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 40px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .user-btn:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--gold);
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255,215,0,0.2);
+        }
+        .chev {
+            opacity: 0.7;
+            transition: transform 0.2s;
+            font-size: 10px;
+        }
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 200px;
+            background: rgba(20,20,28,0.95);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            backdrop-filter: blur(12px);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 200;
+        }
+        .user-menu.open .user-dropdown { display: flex; }
+        .dd-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            text-decoration: none;
+            color: var(--text);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 12px;
+        }
+        .dd-item:hover { background: var(--gold-faint); }
+        .dd-item.danger { color: var(--red); }
+        .dd-ico {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.06);
+            font-size: 12px;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 40px;
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            color: #1a1a1a;
+            font-weight: 800;
+            text-decoration: none;
+            font-size: 11px;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,215,0,0.3); }
+        
+        .container { max-width: 700px; margin: 0 auto; padding: 30px 20px 50px; position: relative; z-index: 1; }
+        .card {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+        }
+        h1 {
+            color: var(--gold);
+            font-family: 'Newsreader', serif;
+            font-style: italic;
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--line);
+        }
+        .info-label {
+            width: 120px;
+            font-weight: 600;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .info-value {
+            flex: 1;
+            color: var(--text);
+            font-size: 13px;
+        }
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            color: #1a1a1a;
+            text-decoration: none;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .btn-back:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(255,215,0,0.3); }
+        .btn-admin {
+            display: inline-block;
+            margin-top: 20px;
+            margin-left: 10px;
+            padding: 8px 20px;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            text-decoration: none;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .btn-admin:hover { background: var(--gold); color: #1a1a1a; }
+        
+        .footer {
+            border-top: 1px solid var(--line);
+            background: rgba(11,11,15,0.8);
+            margin-top: 50px;
+            padding: 30px 0;
+        }
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .footer-brand { display: flex; align-items: center; gap: 8px; }
+        .footer-title { font-family: 'Newsreader', serif; font-style: italic; font-weight: 700; color: var(--gold); font-size: 14px; }
+        .footer-links { display: flex; gap: 24px; }
+        .footer-links a { color: var(--muted2); text-decoration: none; font-size: 10px; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--gold); }
+        .footer-copy { font-size: 9px; color: var(--muted2); }
+        
+        @media (max-width: 768px) {
+            .info-row { flex-direction: column; gap: 6px; }
+            .info-label { width: 100%; }
+            .container { padding: 20px 16px 40px; }
+            .card { padding: 20px; }
+            h1 { font-size: 20px; }
+        }
+        @media (max-width: 900px) {
+            .topbar { flex-direction: column; align-items: center; justify-content: center; padding: 10px 16px; }
+            .topnav { width: 100%; justify-content: center; overflow-x: auto; margin: 8px 0; }
+            .topnav a { white-space: nowrap; }
+            .topbar-actions { justify-content: center; margin-top: 5px; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div class="grid"></div></div>
+
+<header class="topbar">
+    <a class="brand" href="./index.html">
+        <div class="brand-logos">
+            <img src="./assets/logo-demustar.png" alt="DEMUSTAR"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2218%22 fill=%22none%22 stroke=%22%23FFD700%22 stroke-width=%222%22/%3E%3Ctext x=%2220%22 y=%2225%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22%23FFD700%22%3ED%3C/text%3E%3C/svg%3E'">
+            <img src="./assets/logo-pip.png" alt="PIP Semarang"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2218%22 fill=%22none%22 stroke=%22%23FFD700%22 stroke-width=%222%22/%3E%3Ctext x=%2220%22 y=%2225%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22%23FFD700%22%3EP%3C/text%3E%3C/svg%3E'">
+        </div>
+        <div class="brand-text">
+            <div class="brand-title">DEMUSTAR</div>
+            <div class="brand-subtitle">Politeknik Ilmu Pelayaran Semarang</div>
+        </div>
+    </a>
+
+    <nav class="topnav">
+        <a href="./index.html">Beranda</a>
+        <a href="./aspirasi.html">DEM BOX</a>
+        <a href="./prestasi.html">Prestasi</a>
+        <a href="./demclass.html">DEM CLASS</a>
+        <a href="./index.html#tentang">Tentang</a>
+        <a href="./index.html#visi">Visi & Misi</a>
+        <a href="./pemilihan.html">Pemilihan</a>
+    </nav>
+
+    <div class="topbar-actions">
+        <div class="user-menu" id="userMenu">
+            <button class="user-btn" id="userBtn" type="button">
+                <span class="dot"></span>
+                <span>Halo,</span>
+                <b id="userName">Guest</b>
+                <span class="chev">▾</span>
+            </button>
+            <div class="user-dropdown" id="userDropdown">
+                <a class="dd-item" id="profileLink" href="./profile.html">
+                    <span class="dd-ico">👤</span>
+                    <span>Profil</span>
+                </a>
+                <button class="dd-item danger" id="btnLogout">
+                    <span class="dd-ico">🚪</span>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+        <a class="btn-primary" href="./aspirasi.html#kirim-aspirasi">+ Kirim ke DEM BOX</a>
+    </div>
+</header>
+
+<main class="container">
+    <div class="card">
+        <h1>👤 Profil Saya</h1>
+        <div id="profileContent">
+            <div class="info-row"><div class="info-label">Nama</div><div class="info-value" id="pNama">—</div></div>
+            <div class="info-row"><div class="info-label">NIT</div><div class="info-value" id="pNit">—</div></div>
+            <div class="info-row"><div class="info-label">Tanggal Lahir</div><div class="info-value" id="pTglLahir">—</div></div>
+            <div class="info-row"><div class="info-label">Role</div><div class="info-value" id="pRole">—</div></div>
+        </div>
+        <div>
+            <a href="./pemilihan.html" class="btn-back">← Kembali ke Pemilihan</a>
+            <a href="./admin/admin-verifikasi.html" class="btn-admin" id="adminLink" style="display: none;">📊 Dashboard Admin</a>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand"><span class="footer-title">DEMUSTAR</span></div>
+        <div class="footer-links"><a href="#">Tentang Kami</a><a href="#">Kebijakan Privasi</a><a href="#">Kontak</a></div>
+        <p class="footer-copy">© 2026 DEMUSTAR. ALL RIGHTS RESERVED.</p>
+    </div>
+</footer>
+
+<script>
+    const userMenu = document.getElementById('userMenu');
+    const userBtn = document.getElementById('userBtn');
+    const userName = document.getElementById('userName');
+    const profileLink = document.getElementById('profileLink');
+    const btnLogout = document.getElementById('btnLogout');
+    const adminLink = document.getElementById('adminLink');
+    const userDropdown = document.getElementById('userDropdown');
+
+    let currentUser = null;
+
+    async function loadProfile() {
+        // Cek dari localStorage
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                if (user && user.nama) {
+                    currentUser = user;
+                    document.getElementById('pNama').textContent = user.nama || '—';
+                    document.getElementById('pNit').textContent = user.nit || '—';
+                    document.getElementById('pTglLahir').textContent = user.tanggal_lahir || '—';
+                    document.getElementById('pRole').textContent = user.role || 'user';
+                    userName.textContent = user.nama;
+                    
+                    if (user.role === 'admin') {
+                        adminLink.style.display = 'inline-block';
+                    }
+                    return;
+                }
+            } catch(e) {}
+        }
+        
+        // Cek dari sessionStorage
+        const welcomeData = sessionStorage.getItem('demustar_welcome');
+        if (welcomeData) {
+            try {
+                const data = JSON.parse(welcomeData);
+                if (data && data.name) {
+                    currentUser = data;
+                    document.getElementById('pNama').textContent = data.name || '—';
+                    document.getElementById('pNit').textContent = data.nit || '—';
+                    document.getElementById('pTglLahir').textContent = data.tanggal_lahir || '—';
+                    document.getElementById('pRole').textContent = data.role || 'user';
+                    userName.textContent = data.name;
+                    
+                    if (data.role === 'admin') {
+                        adminLink.style.display = 'inline-block';
+                    }
+                    return;
+                }
+            } catch(e) {}
+        }
+        
+        // Cek ke API
+        try {
+            const res = await fetch('/demustar/api/auth/me.php', { credentials: 'same-origin' });
+            const data = await res.json();
+            if (res.ok && data.ok && data.user) {
+                currentUser = data.user;
+                document.getElementById('pNama').textContent = data.user.nama || '—';
+                document.getElementById('pNit').textContent = data.user.nit || '—';
+                document.getElementById('pTglLahir').textContent = data.user.tanggal_lahir || '—';
+                document.getElementById('pRole').textContent = data.user.role || 'user';
+                userName.textContent = data.user.nama;
+                
+                if (data.user.role === 'admin') {
+                    adminLink.style.display = 'inline-block';
+                }
+                return;
+            }
+        } catch(e) {}
+        
+        // Guest
+        document.getElementById('pNama').textContent = 'Guest';
+        document.getElementById('pNit').textContent = '—';
+        document.getElementById('pTglLahir').textContent = '—';
+        document.getElementById('pRole').textContent = 'Belum login';
+        userName.textContent = 'Guest';
+        adminLink.style.display = 'none';
+    }
+
+    async function logout() {
+        try { await fetch('/demustar/api/auth/logout.php', { method: 'POST', credentials: 'same-origin' }); } catch(e) {}
+        sessionStorage.clear();
+        localStorage.clear();
+        window.location.href = './index.html';
+    }
+
+    userBtn.onclick = (e) => { e.stopPropagation(); userMenu.classList.toggle('open'); };
+    document.addEventListener('click', (e) => { if (!userMenu.contains(e.target)) userMenu.classList.remove('open'); });
+    btnLogout.onclick = logout;
+
+    loadProfile();
+</script>
+</body>
+</html>

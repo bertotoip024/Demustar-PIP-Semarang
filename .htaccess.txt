@@ -1,0 +1,12 @@
+# .htaccess
+php_value session.cookie_path /
+php_value session.name DEMUSTAR_NAUTIKA
+php_value session.cookie_httponly 1
+
+<IfModule mod_headers.c>
+    Header always edit Set-Cookie (.*) "$1; Path=/"
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Credentials "true"
+</IfModule>
+
+RewriteEngine On

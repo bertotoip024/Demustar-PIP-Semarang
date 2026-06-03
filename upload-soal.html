@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Soal - Nautika</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Manrope', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0b0b0f 0%, #131318 100%);
+            color: #f5e6c8;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+        
+        .card {
+            background: rgba(20, 20, 28, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 215, 0, 0.12);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        
+        h1 {
+            font-family: 'Newsreader', serif;
+            font-style: italic;
+            font-size: 36px;
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+        
+        .question-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .question-number {
+            font-weight: 700;
+            color: #FFD700;
+        }
+        
+        .remove-question {
+            background: rgba(255, 90, 122, 0.2);
+            border: 1px solid #ff5a7a;
+            color: #ff5a7a;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .option input {
+            flex: 1;
+        }
+        
+        .correct-option {
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #FFD700, #b8860b);
+            color: #1a1a1a;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #f5e6c8;
+        }
+        
+        .btn-danger {
+            background: rgba(255, 90, 122, 0.8);
+            color: white;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        select, input, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            color: #f5e6c8;
+            font-size: 14px;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        
+        .alert-success {
+            background: rgba(136, 217, 130, 0.2);
+            border: 1px solid #88d982;
+            color: #88d982;
+        }
+        
+        .alert-error {
+            background: rgba(255, 90, 122, 0.2);
+            border: 1px solid #ff5a7a;
+            color: #ff5a7a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>📝 Upload Soal Quiz</h1>
+            <p class="subtitle" style="color: rgba(245,230,200,0.6); margin-bottom: 24px;">Buat soal untuk menguji pemahaman taruna</p>
+            
+            <div id="alert" class="alert"></div>
+            
+            <div class="form-group">
+                <label>Pilih Materi *</label>
+                <select id="materiSelect">
+                    <option value="">-- Pilih Materi --</option>
+                </select>
+            </div>
+            
+            <div id="questionsContainer"></div>
+            
+            <button onclick="addQuestion()" class="btn-secondary" style="width: 100%; margin-top: 16px;">+ Tambah Soal</button>
+            
+            <div class="button-group">
+                <button onclick="saveAllSoal()">💾 Simpan Semua Soal</button>
+                <button onclick="window.location.href='beranda-nautika.html'" class="btn-secondary">← Kembali</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let questions = [];
+        let materiList = [];
+        
+        // Load materi untuk dropdown
+        async function loadMateri() {
+            try {
+                const response = await fetch('api/materi.php');
+                const result = await response.json();
+                if(result.success) {
+                    materiList = result.data;
+                    const select = document.getElementById('materiSelect');
+                    select.innerHTML = '<option value="">-- Pilih Materi --</option>';
+                    materiList.forEach(materi => {
+                        select.innerHTML += `<option value="${materi.id}">${materi.judul} (${materi.bab})</option>`;
+                    });
+                }
+            } catch(error) {
+                console.error('Error loading materi:', error);
+            }
+        }
+        
+        function addQuestion() {
+            const questionId = Date.now();
+            questions.push({
+                id: questionId,
+                pertanyaan: '',
+                pilihan_a: '',
+                pilihan_b: '',
+                pilihan_c: '',
+                pilihan_d: '',
+                jawaban_benar: 'A',
+                bobot: 1
+            });
+            renderQuestions();
+        }
+        
+        function removeQuestion(id) {
+            questions = questions.filter(q => q.id !== id);
+            renderQuestions();
+        }
+        
+        function updateQuestion(id, field, value) {
+            const question = questions.find(q => q.id === id);
+            if(question) {
+                question[field] = value;
+            }
+        }
+        
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            if(questions.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(245,230,200,0.5);">Belum ada soal. Klik "Tambah Soal" untuk mulai</div>';
+                return;
+            }
+            
+            container.innerHTML = questions.map((q, index) => `
+                <div class="question-item">
+                    <div class="question-header">
+                        <span class="question-number">Soal ${index + 1}</span>
+                        <span class="remove-question" onclick="removeQuestion(${q.id})">Hapus</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Pertanyaan</label>
+                        <textarea onchange="updateQuestion(${q.id}, 'pertanyaan', this.value)" placeholder="Tulis pertanyaan disini...">${escapeHtml(q.pertanyaan)}</textarea>
+                    </div>
+                    
+                    <div class="options-grid">
+                        <div class="option">
+                            <label>A.</label>
+                            <input type="text" onchange="updateQuestion(${q.id}, 'pilihan_a', this.value)" placeholder="Pilihan A" value="${escapeHtml(q.pilihan_a)}">
+                        </div>
+                        <div class="option">
+                            <label>B.</label>
+                            <input type="text" onchange="updateQuestion(${q.id}, 'pilihan_b', this.value)" placeholder="Pilihan B" value="${escapeHtml(q.pilihan_b)}">
+                        </div>
+                        <div class="option">
+                            <label>C.</label>
+                            <input type="text" onchange="updateQuestion(${q.id}, 'pilihan_c', this.value)" placeholder="Pilihan C" value="${escapeHtml(q.pilihan_c)}">
+                        </div>
+                        <div class="option">
+                            <label>D.</label>
+                            <input type="text" onchange="updateQuestion(${q.id}, 'pilihan_d', this.value)" placeholder="Pilihan D" value="${escapeHtml(q.pilihan_d)}">
+                        </div>
+                    </div>
+                    
+                    <div class="correct-option">
+                        <label>Jawaban Benar:</label>
+                        <select onchange="updateQuestion(${q.id}, 'jawaban_benar', this.value)">
+                            <option value="A" ${q.jawaban_benar === 'A' ? 'selected' : ''}>A</option>
+                            <option value="B" ${q.jawaban_benar === 'B' ? 'selected' : ''}>B</option>
+                            <option value="C" ${q.jawaban_benar === 'C' ? 'selected' : ''}>C</option>
+                            <option value="D" ${q.jawaban_benar === 'D' ? 'selected' : ''}>D</option>
+                        </select>
+                        
+                        <label>Bobot:</label>
+                        <input type="number" style="width: 80px;" onchange="updateQuestion(${q.id}, 'bobot', parseInt(this.value))" value="${q.bobot}" min="1" max="5">
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function saveAllSoal() {
+            const materiId = document.getElementById('materiSelect').value;
+            if(!materiId) {
+                showAlert('error', '❌ Pilih materi terlebih dahulu');
+                return;
+            }
+            
+            if(questions.length === 0) {
+                showAlert('error', '❌ Minimal 1 soal');
+                return;
+            }
+            
+            for(const question of questions) {
+                if(!question.pertanyaan || !question.pilihan_a || !question.pilihan_b || !question.pilihan_c || !question.pilihan_d) {
+                    showAlert('error', '❌ Semua field harus diisi');
+                    return;
+                }
+            }
+            
+            showAlert('info', 'Menyimpan soal...');
+            
+            let successCount = 0;
+            for(const question of questions) {
+                const data = {
+                    materi_id: parseInt(materiId),
+                    pertanyaan: question.pertanyaan,
+                    pilihan_a: question.pilihan_a,
+                    pilihan_b: question.pilihan_b,
+                    pilihan_c: question.pilihan_c,
+                    pilihan_d: question.pilihan_d,
+                    jawaban_benar: question.jawaban_benar,
+                    bobot: question.bobot,
+                    created_by: 1 // Ganti dengan ID user yang login
+                };
+                
+                try {
+                    const response = await fetch('api/soal.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+                    if(result.success) successCount++;
+                } catch(error) {
+                    console.error('Error saving question:', error);
+                }
+            }
+            
+            if(successCount === questions.length) {
+                showAlert('success', `✅ ${successCount} soal berhasil disimpan! Halaman akan refresh...`);
+                setTimeout(() => window.location.reload(), 2000);
+            } else {
+                showAlert('error', `❌ Hanya ${successCount} dari ${questions.length} soal yang tersimpan`);
+            }
+        }
+        
+        function showAlert(type, message) {
+            const alertDiv = document.getElementById('alert');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertDiv.style.display = 'block';
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+        
+        loadMateri();
+    </script>
+</body>
+</html>

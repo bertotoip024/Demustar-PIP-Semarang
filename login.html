@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login • DEMUSTAR</title>
+  <link rel="stylesheet" href="./login.css" />
+  <style>
+    /* Tambahan style untuk demo credentials */
+    .demo-credentials {
+      margin-top: 20px;
+      padding: 12px;
+      background: rgba(255, 215, 0, 0.08);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      border-radius: 12px;
+      font-size: 11px;
+      text-align: center;
+    }
+    .demo-credentials strong {
+      color: #FFD700;
+    }
+    .demo-credentials p {
+      margin: 5px 0;
+      color: rgba(245, 230, 200, 0.7);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg" aria-hidden="true">
+    <div class="orb o1"></div>
+    <div class="orb o2"></div>
+    <div class="orb o3"></div>
+    <div class="grid"></div>
+    <div class="noise"></div>
+  </div>
+
+  <div class="page">
+    <header class="topbar">
+      <a class="backlink" href="./index.html">← Kembali ke Beranda</a>
+      <div class="brand-mini"><span class="brand-dot"></span><span>DEMUSTAR</span></div>
+    </header>
+
+    <main class="wrap">
+      <section class="panel panel-left">
+        <div class="panel-inner">
+          <div class="head">
+            <div class="app-icon" aria-hidden="true"></div>
+            <div>
+              <h1 class="title">Portal Aspirasi</h1>
+              <p class="muted">Masuk untuk verifikasi aspirasi (admin) atau akses fitur internal.</p>
+            </div>
+          </div>
+
+          <div class="pill">
+            <span class="pill-dot"></span>
+            Login menggunakan <b>NIT</b>. Password awal sama dengan NIT.
+          </div>
+
+          <div class="feature-list">
+            <article class="feature">
+              <div class="feature-ico">✓</div>
+              <div>
+                <h3>Terverifikasi</h3>
+                <p class="muted">Aspirasi diverifikasi admin sebelum diproses lebih lanjut.</p>
+              </div>
+            </article>
+
+            <article class="feature">
+              <div class="feature-ico">≡</div>
+              <div>
+                <h3>Terstruktur</h3>
+                <p class="muted">Filter data berdasarkan kategori dan status (pending/proses/selesai).</p>
+              </div>
+            </article>
+
+            <article class="feature">
+              <div class="feature-ico">⦿</div>
+              <div>
+                <h3>Transparan</h3>
+                <p class="muted">Progres tampil tanpa membocorkan identitas pengirim (anonim aman).</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="foot muted">© <span id="year"></span> DEMUSTAR</div>
+        </div>
+      </section>
+
+      <section class="panel panel-right">
+        <div class="panel-inner">
+          <div class="login-head">
+            <div>
+              <h2 class="title">Login</h2>
+              <p class="muted">Masukkan NIT kamu. Jika belum pernah ganti password, gunakan password = NIT.</p>
+            </div>
+            <div class="badge-sec"><span class="badge-dot"></span> Aman • Sesi Terenkripsi</div>
+          </div>
+
+          <form id="loginForm" method="post" action="#" novalidate>
+            <label for="nit">NIT</label>
+            <input id="nit" name="nit" type="text" placeholder="Contoh: admin001 atau 2220002" required value="">
+
+            <label for="tanggal_lahir">Tanggal Lahir</label>
+            <input id="tanggal_lahir" name="tanggal_lahir" type="date" required>
+            <p class="hint">Pilih tanggal dari kalender (format YYYY-MM-DD).</p>
+
+            <label for="password">Password</label>
+
+            <div style="position:relative;">
+              <input id="password" name="password" type="password" placeholder="Masukkan password" required>
+              <button id="togglePass" type="button"
+                style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:transparent; border:none; cursor:pointer; font-size:18px;">
+                👁
+              </button>
+            </div>
+
+            <button id="btnLogin" type="submit">Login</button>
+
+            <p id="loginStatus" class="muted" style="margin-top:10px;"></p>
+          </form>
+
+          <!-- Demo Credentials -->
+          <div class="demo-credentials">
+            <strong>📋 Demo Akun</strong>
+            <p>👑 Admin: NIT = <strong>admin001</strong> | Password = <strong>admin001</strong> | Tgl Lahir = <strong>2000-01-01</strong></p>
+            <p>👤 User: NIT = <strong>2220002</strong> | Password = <strong>2220002</strong> | Tgl Lahir = <strong>2004-07-21</strong></p>
+            <p>👤 User: NIT = <strong>22000</strong> | Password = <strong>22000</strong> | Tgl Lahir = <strong>2005-03-15</strong></p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./login.js" defer></script>
+</body>
+</html>

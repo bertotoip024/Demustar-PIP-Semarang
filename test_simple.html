@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Simple</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Test API Aspirasi</h1>
+    <button onclick="testAPI()">Test API</button>
+    <pre id="result">Klik tombol untuk test...</pre>
+    
+    <script>
+        async function testAPI() {
+            const pre = document.getElementById('result');
+            pre.textContent = 'Loading...';
+            
+            try {
+                const res = await fetch('/demustar/api/aspirasi.php');
+                const text = await res.text();
+                pre.textContent = text;
+            } catch(err) {
+                pre.textContent = 'Error: ' + err.message;
+            }
+        }
+        
+        // Auto test saat halaman dibuka
+        testAPI();
+    </script>
+</body>
+</html>

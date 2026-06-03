@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEM CLASS • DEMUSTAR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..800&family=Manrope:wght@300..800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0b0f;
+            --bg2: #131318;
+            --surface: rgba(20, 20, 28, 0.85);
+            --surface2: rgba(30, 30, 38, 0.9);
+            --gold: #FFD700;
+            --gold-faint: rgba(255, 215, 0, 0.08);
+            --green: #88d982;
+            --blue: #4f8cff;
+            --red: #ff5a7a;
+            --text: #f5e6c8;
+            --muted: rgba(245, 230, 200, 0.7);
+            --muted2: rgba(245, 230, 200, 0.5);
+            --line: rgba(255, 215, 0, 0.12);
+            --shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            --radius: 16px;
+            --radius-lg: 24px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Manrope', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+        .bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; animation: float 20s infinite ease-in-out; }
+        .o1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,215,0,0.45), transparent); top: -150px; left: -150px; }
+        .o2 { width: 450px; height: 450px; background: radial-gradient(circle, rgba(255,215,0,0.4), transparent); bottom: -100px; right: -100px; animation-delay: -5s; }
+        .o3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(255,215,0,0.35), transparent); top: 40%; left: 70%; animation-delay: -10s; }
+        @keyframes float { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px, -30px) scale(1.05); } }
+        .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,215,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,215,0,0.03) 1px, transparent 1px); background-size: 50px 50px; }
+        
+        /* Topbar - Center Navbar */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px;
+            background: rgba(11, 11, 15, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--line);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .brand-logos {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .brand-logos img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,.18);
+            background: rgba(255,215,0,.05);
+            padding: 2px;
+        }
+        .brand-title {
+            font-family: 'Newsreader', serif;
+            font-style: italic;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 0.5px;
+        }
+        .brand-subtitle {
+            font-size: 8px;
+            color: var(--muted2);
+            letter-spacing: 0.3px;
+        }
+        .topnav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.03);
+            padding: 4px 10px;
+            border-radius: 40px;
+            border: 1px solid var(--line);
+            flex: 1;
+            margin: 0 15px;
+        }
+        .topnav a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 40px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .topnav a:hover, .topnav a.active {
+            color: var(--gold);
+            background: var(--gold-faint);
+        }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .user-menu { position: relative; }
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 40px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .user-btn:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--gold);
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255,215,0,0.2);
+        }
+        .chev {
+            opacity: 0.7;
+            transition: transform 0.2s;
+            font-size: 10px;
+        }
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 170px;
+            background: rgba(20,20,28,0.95);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            backdrop-filter: blur(12px);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 200;
+        }
+        .user-menu.open .user-dropdown { display: flex; }
+        .dd-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            text-decoration: none;
+            color: var(--text);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 12px;
+        }
+        .dd-item:hover { background: var(--gold-faint); }
+        .dd-item.danger { color: var(--red); }
+        .dd-ico {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.06);
+            font-size: 12px;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 40px;
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            color: #1a1a1a;
+            font-weight: 800;
+            text-decoration: none;
+            font-size: 11px;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,215,0,0.3); }
+        
+        .page { max-width: 1100px; margin: 0 auto; padding: 30px 20px 50px; position: relative; z-index: 1; }
+        
+        .hero {
+            text-align: center;
+            padding: 35px 20px;
+            background: radial-gradient(ellipse at 50% 0%, rgba(255,215,0,0.08), transparent 60%);
+            border-radius: var(--radius-lg);
+            margin-bottom: 35px;
+        }
+        .hero-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 40px;
+            background: var(--gold-faint);
+            border: 1px solid rgba(255,215,0,0.2);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 16px;
+        }
+        .hero h1 {
+            font-family: 'Newsreader', serif;
+            font-style: italic;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .hero h1 .gold { color: var(--gold); }
+        .hero-desc {
+            font-size: 13px;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin: 35px 0;
+        }
+        @media (max-width: 900px) { .class-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .class-grid { grid-template-columns: 1fr; } }
+        
+        .class-card {
+            background: var(--surface2);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            padding: 24px 20px;
+            text-align: center;
+            transition: all 0.3s var(--ease);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .class-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--gold);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+        .class-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), #b8860b);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        .class-card:hover::before { transform: scaleX(1); }
+        
+        .class-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 72px;
+        }
+        .class-card h2 {
+            font-family: 'Newsreader', serif;
+            font-style: italic;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+        .class-card p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+        .class-btn {
+            display: inline-block;
+            padding: 8px 22px;
+            border-radius: 40px;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+        .class-card:hover .class-btn {
+            background: var(--gold);
+            color: #1a1a1a;
+        }
+        
+        /* Statistics Banner */
+        .stats-banner {
+            background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.05));
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin: 35px 0;
+            text-align: center;
+        }
+        .stats-banner h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--gold);
+        }
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .stat-number {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--gold);
+        }
+        .stat-label {
+            font-size: 10px;
+            color: var(--muted2);
+            margin-top: 4px;
+        }
+        
+        .features-section {
+            margin: 50px 0;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section-title h2 {
+            font-family: 'Newsreader', serif;
+            font-style: italic;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .section-title .gold { color: var(--gold); }
+        .section-title p { color: var(--muted); font-size: 12px; }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 900px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .features-grid { grid-template-columns: 1fr; } }
+        
+        .feature-card {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--gold);
+        }
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        .feature-card h3 {
+            font-size: 16px;
+            margin-bottom: 6px;
+            color: var(--gold);
+        }
+        .feature-card p {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+        
+        .testimonial-section {
+            margin: 50px 0;
+        }
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 900px) { .testimonial-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .testimonial-grid { grid-template-columns: 1fr; } }
+        .testimonial-card {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            text-align: center;
+        }
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--gold-faint);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 24px;
+        }
+        .testimonial-text {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+        .testimonial-name {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .footer {
+            border-top: 1px solid var(--line);
+            background: rgba(11,11,15,0.8);
+            margin-top: 50px;
+            padding: 30px 0;
+        }
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-brand img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            border-radius: 5px;
+        }
+        .footer-title {
+            font-family: 'Newsreader', serif;
+            font-style: italic;
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 14px;
+        }
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+        .footer-links a {
+            color: var(--muted2);
+            text-decoration: none;
+            font-size: 10px;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover { color: var(--gold); }
+        .footer-copy { font-size: 9px; color: var(--muted2); }
+        
+        @media (max-width: 900px) {
+            .topbar { flex-direction: column; align-items: center; justify-content: center; padding: 10px 16px; }
+            .topnav { width: 100%; justify-content: center; overflow-x: auto; margin: 8px 0; }
+            .topnav a { white-space: nowrap; }
+            .topbar-actions { justify-content: center; margin-top: 5px; }
+            .hero h1 { font-size: 28px; }
+            .class-grid { gap: 16px; }
+        }
+        @media (max-width: 600px) {
+            .page { padding: 20px 16px 40px; }
+            .hero { padding: 25px 16px; }
+            .hero h1 { font-size: 24px; }
+            .hero-desc { font-size: 11px; }
+            .class-card h2 { font-size: 18px; }
+            .stats-banner h3 { font-size: 16px; }
+            .section-title h2 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div class="grid"></div></div>
+
+<header class="topbar">
+    <a class="brand" href="./index.html">
+        <div class="brand-logos">
+            <img src="./assets/logo-demustar.png" alt="DEMUSTAR"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2218%22 fill=%22none%22 stroke=%22%23FFD700%22 stroke-width=%222%22/%3E%3Ctext x=%2220%22 y=%2225%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22%23FFD700%22%3ED%3C/text%3E%3C/svg%3E'">
+            <img src="./assets/logo-pip.png" alt="PIP Semarang"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2218%22 fill=%22none%22 stroke=%22%23FFD700%22 stroke-width=%222%22/%3E%3Ctext x=%2220%22 y=%2225%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22%23FFD700%22%3EP%3C/text%3E%3C/svg%3E'">
+        </div>
+        <div class="brand-text">
+            <div class="brand-title">DEMUSTAR</div>
+            <div class="brand-subtitle">Politeknik Ilmu Pelayaran Semarang</div>
+        </div>
+    </a>
+
+    <nav class="topnav">
+        <a href="./index.html">Beranda</a>
+        <a href="./aspirasi.html">DEM BOX</a>
+        <a href="./prestasi.html">Prestasi</a>
+        <a href="./demclass.html" class="active">DEM CLASS</a>
+        <a href="./index.html#tentang">Tentang</a>
+        <a href="./index.html#visi">Visi & Misi</a>
+        <a href="./pemilihan.html">Pemilihan</a>
+    </nav>
+
+    <div class="topbar-actions">
+        <div class="user-menu" id="userMenu">
+            <button class="user-btn" id="userBtn" type="button">
+                <span class="dot"></span>
+                <span>Halo,</span>
+                <b id="userName">Guest</b>
+                <span class="chev">▾</span>
+            </button>
+            <div class="user-dropdown" id="userDropdown">
+                <a class="dd-item" id="profileLink" href="./profile.html">
+                    <span class="dd-ico">👤</span>
+                    <span>Profil</span>
+                </a>
+                <button class="dd-item danger" id="btnLogout">
+                    <span class="dd-ico">🚪</span>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+        <a class="btn-primary" href="./aspirasi.html">+ Kirim ke DEM BOX</a>
+    </div>
+</header>
+
+<main class="page">
+    <section class="hero">
+        <span class="hero-badge">DEM CLASS</span>
+        <h1>Belajar <span class="gold">Bersama</span> DEMUSTAR</h1>
+        <p class="hero-desc">Pilih kelas sesuai dengan jurusanmu. Akses materi, tugas, dan diskusi bersama teman-teman sejurusan.</p>
+    </section>
+
+    <!-- 3 PILIHAN BERANDA -->
+    <div class="class-grid">
+        <div class="class-card" onclick="location.href='beranda-nautika.html'">
+            <div class="class-icon"><svg viewBox="0 0 100 100" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer ring -->
+  <circle cx="50" cy="50" r="40" fill="none" stroke="var(--gold)" stroke-width="8"/>
+  <!-- Inner ring -->
+  <circle cx="50" cy="50" r="24" fill="none" stroke="var(--gold)" stroke-width="5"/>
+  <!-- Hub -->
+  <circle cx="50" cy="50" r="7" fill="var(--gold)"/>
+  <circle cx="50" cy="50" r="3" fill="#1a1200"/>
+  <!-- 8 spokes evenly at 45° each -->
+  <line x1="50" y1="26" x2="50" y2="10"  stroke="var(--gold)" stroke-width="6" stroke-linecap="round"/>
+  <line x1="50" y1="74" x2="50" y2="90"  stroke="var(--gold)" stroke-width="6" stroke-linecap="round"/>
+  <line x1="26" y1="50" x2="10" y2="50"  stroke="var(--gold)" stroke-width="6" stroke-linecap="round"/>
+  <line x1="74" y1="50" x2="90" y2="50"  stroke="var(--gold)" stroke-width="6" stroke-linecap="round"/>
+  <line x1="32.9" y1="32.9" x2="21.5" y2="21.5" stroke="var(--gold)" stroke-width="6" stroke-linecap="round"/>
+  <line x1="67.1" y1="67.1" x2="78.5" y2="78.5" stroke="var(--gold)" stroke-width="6" stroke-linecap="round"/>
+  <line x1="67.1" y1="32.9" x2="78.5" y2="21.5" stroke="var(--gold)" stroke-width="6" stroke-linecap="round"/>
+  <line x1="32.9" y1="67.1" x2="21.5" y2="78.5" stroke="var(--gold)" stroke-width="6" stroke-linecap="round"/>
+  <!-- Handle tips (circles at ring edge) -->
+  <circle cx="50"  cy="10"  r="4.5" fill="var(--gold)"/>
+  <circle cx="50"  cy="90"  r="4.5" fill="var(--gold)"/>
+  <circle cx="10"  cy="50"  r="4.5" fill="var(--gold)"/>
+  <circle cx="90"  cy="50"  r="4.5" fill="var(--gold)"/>
+  <circle cx="21.5" cy="21.5" r="4.5" fill="var(--gold)"/>
+  <circle cx="78.5" cy="78.5" r="4.5" fill="var(--gold)"/>
+  <circle cx="78.5" cy="21.5" r="4.5" fill="var(--gold)"/>
+  <circle cx="21.5" cy="78.5" r="4.5" fill="var(--gold)"/>
+</svg></div>
+            <h2>Beranda Nautika</h2>
+            <p>Materi navigasi, ilmu pelayaran, meteorologi, dan kompetensi nautika kapal niaga. Untuk taruna jurusan Nautika.</p>
+            <span class="class-btn">Masuk Kelas →</span>
+        </div>
+
+        <div class="class-card" onclick="location.href='beranda-teknika.html'">
+            <div class="class-icon"><svg viewBox="0 0 100 100" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="7" fill="var(--gold)"/>
+  <circle cx="50" cy="50" r="3" fill="#1a1200"/>
+  <path d="M50 43 C46 35, 42 18, 50 10 C58 18, 54 35, 50 43Z" fill="var(--gold)" transform="rotate(0   50 50)"/>
+  <path d="M50 43 C46 35, 42 18, 50 10 C58 18, 54 35, 50 43Z" fill="var(--gold)" transform="rotate(120 50 50)"/>
+  <path d="M50 43 C46 35, 42 18, 50 10 C58 18, 54 35, 50 43Z" fill="var(--gold)" transform="rotate(240 50 50)"/>
+  <path d="M50 10 A40 40 0 0 1 84.6 30" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.5" transform="rotate(30  50 50)"/>
+  <path d="M50 10 A40 40 0 0 1 84.6 30" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.5" transform="rotate(150 50 50)"/>
+  <path d="M50 10 A40 40 0 0 1 84.6 30" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.5" transform="rotate(270 50 50)"/>
+</svg></div>
+            <h2>Beranda Teknika</h2>
+            <p>Materi mesin kapal, sistem kelistrikan, perawatan, dan teknologi maritim. Untuk taruna jurusan Teknika.</p>
+            <span class="class-btn">Masuk Kelas →</span>
+        </div>
+
+        <div class="class-card" onclick="location.href='beranda-kalk.html'">
+            <div class="class-icon"><svg viewBox="0 0 110 85" width="68" height="52" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <!-- Left cover + pages -->
+  <path d="M55 75 Q30 70 8 62 L10 20 Q32 28 55 25Z" fill="rgba(255,215,0,.12)" stroke="var(--gold)" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M53 75 Q30 71 10 64" stroke="var(--gold)" stroke-width="1.3" opacity="0.5"/>
+  <path d="M51 75 Q32 73 13 67" stroke="var(--gold)" stroke-width="1"   opacity="0.35"/>
+  <!-- Right cover + pages -->
+  <path d="M55 75 Q80 70 102 62 L100 20 Q78 28 55 25Z" fill="rgba(255,215,0,.12)" stroke="var(--gold)" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M57 75 Q80 71 100 64" stroke="var(--gold)" stroke-width="1.3" opacity="0.5"/>
+  <path d="M59 75 Q78 73 97 67"  stroke="var(--gold)" stroke-width="1"   opacity="0.35"/>
+  <!-- Spine -->
+  <line x1="55" y1="25" x2="55" y2="75" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Spine bottom curl -->
+  <path d="M55 75 Q55 80 55 82" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Left text lines -->
+  <line x1="22" y1="38" x2="44" y2="35" stroke="var(--gold)" stroke-width="1.6" opacity="0.6" stroke-linecap="round"/>
+  <line x1="20" y1="46" x2="42" y2="43" stroke="var(--gold)" stroke-width="1.6" opacity="0.6" stroke-linecap="round"/>
+  <line x1="18" y1="54" x2="40" y2="51" stroke="var(--gold)" stroke-width="1.4" opacity="0.45" stroke-linecap="round"/>
+  <!-- Right text lines -->
+  <line x1="66" y1="35" x2="88" y2="38" stroke="var(--gold)" stroke-width="1.6" opacity="0.6" stroke-linecap="round"/>
+  <line x1="68" y1="43" x2="90" y2="46" stroke="var(--gold)" stroke-width="1.6" opacity="0.6" stroke-linecap="round"/>
+  <line x1="70" y1="51" x2="92" y2="54" stroke="var(--gold)" stroke-width="1.4" opacity="0.45" stroke-linecap="round"/>
+</svg></div>
+            <h2>Beranda KALK</h2>
+            <p>Materi kalkulasi, matematika pelayaran, rumus navigasi, dan perhitungan teknis untuk semua jurusan.</p>
+            <span class="class-btn">Masuk Kelas →</span>
+        </div>
+    </div>
+
+    <!-- Statistics Banner -->
+    <div class="stats-banner">
+        <h3>📊 Statistik DEM CLASS</h3>
+        <div class="stats-container">
+            <div class="stat-item"><div class="stat-number">5+</div><div class="stat-label">Jurusan Aktif</div></div>
+            <div class="stat-item"><div class="stat-number">120+</div><div class="stat-label">Materi Tersedia</div></div>
+            <div class="stat-item"><div class="stat-number">1.500+</div><div class="stat-label">Siswa Terdaftar</div></div>
+            <div class="stat-item"><div class="stat-number">98%</div><div class="stat-label">Kepuasan Belajar</div></div>
+        </div>
+    </div>
+
+    <!-- Fitur Unggulan -->
+    <div class="features-section">
+        <div class="section-title">
+            <h2>Fitur <span class="gold">Unggulan</span></h2>
+            <p>Belajar lebih efektif dengan fitur-fitur terbaik dari DEM CLASS</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card"><div class="feature-icon">📚</div><h3>Materi Lengkap</h3><p>Akses materi pembelajaran sesuai kurikulum, video, dan modul praktikum untuk setiap jurusan.</p></div>
+            <div class="feature-card"><div class="feature-icon">💬</div><h3>Diskusi Interaktif</h3><p>Forum diskusi dengan dosen dan sesama taruna untuk bertanya dan berbagi ilmu.</p></div>
+            <div class="feature-card"><div class="feature-icon">📝</div><h3>Latihan Soal</h3><p>Bank soal dan ujian online untuk menguji pemahaman materi secara mandiri.</p></div>
+            <div class="feature-card"><div class="feature-icon">📊</div><h3>Progress Belajar</h3><p>Pantau perkembangan belajarmu melalui dashboard dan laporan mingguan.</p></div>
+            <div class="feature-card"><div class="feature-icon">🏆</div><h3>Sertifikat</h3><p>Dapatkan sertifikat setelah menyelesaikan setiap modul dengan nilai memuaskan.</p></div>
+            <div class="feature-card"><div class="feature-icon">👥</div><h3>Study Group</h3><p>Bergabung dengan grup belajar teman sekelas untuk diskusi dan kerja kelompok.</p></div>
+        </div>
+    </div>
+
+    <!-- Testimonial Section -->
+    <div class="testimonial-section">
+        <div class="section-title">
+            <h2>Apa Kata <span class="gold">Mereka?</span></h2>
+            <p>Testimoni dari para taruna yang telah belajar di DEM CLASS</p>
+        </div>
+        <div class="testimonial-grid">
+            <div class="testimonial-card"><div class="testimonial-avatar">⭐</div><div class="testimonial-text">"Materi di DEM CLASS sangat lengkap dan mudah dipahami. Saya jadi lebih percaya diri menghadapi ujian."</div><div class="testimonial-name">- Andi Pratama, Nautika</div></div>
+            <div class="testimonial-card"><div class="testimonial-avatar">⚙️</div><div class="testimonial-text">"Fitur diskusinya sangat membantu. Setiap ada soal sulit, langsung bisa tanya dan dijawab."</div><div class="testimonial-name">- Budi Santoso, Teknika</div></div>
+            <div class="testimonial-card"><div class="testimonial-avatar">📐</div><div class="testimonial-text">"Latihan soalnya banyak dan variatif. Sangat recommended untuk persiapan ujian!"</div><div class="testimonial-name">- Siti Rahma, KALK</div></div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <img src="./assets/logo-demustar.png" alt="DEMUSTAR">
+            <span class="footer-title">DEMUSTAR</span>
+        </div>
+        <div class="footer-links">
+            <a href="#">Tentang Kami</a>
+            <a href="#">Kebijakan Privasi</a>
+            <a href="#">Kontak</a>
+        </div>
+        <p class="footer-copy">© 2026 DEMUSTAR. ALL RIGHTS RESERVED.</p>
+    </div>
+</footer>
+
+<script>
+    const userMenu = document.getElementById('userMenu');
+    const userBtn = document.getElementById('userBtn');
+    const userName = document.getElementById('userName');
+    const btnLogout = document.getElementById('btnLogout');
+
+    async function updateUserUI() {
+        const welcomeData = sessionStorage.getItem('demustar_welcome');
+        if (welcomeData) {
+            try { const data = JSON.parse(welcomeData); if (data && data.name) { userName.textContent = data.name; return; } } catch(e) {}
+        }
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            try { const user = JSON.parse(userStr); if (user && user.nama) { userName.textContent = user.nama; return; } } catch(e) {}
+        }
+        try {
+            const res = await fetch('/demustar/api/auth/me.php', { credentials: 'same-origin' });
+            const data = await res.json();
+            if (res.ok && data.ok && data.user) {
+                userName.textContent = data.user.nama || 'Guest';
+                return;
+            }
+        } catch(e) {}
+        userName.textContent = 'Guest';
+    }
+
+    async function logout() {
+        try { await fetch('/demustar/api/auth/logout.php', { method: 'POST', credentials: 'same-origin' }); } catch(e) {}
+        sessionStorage.clear(); localStorage.clear(); window.location.href = './index.html';
+    }
+
+    userBtn.onclick = (e) => { e.stopPropagation(); userMenu.classList.toggle('open'); };
+    document.addEventListener('click', (e) => { if (!userMenu.contains(e.target)) userMenu.classList.remove('open'); });
+    btnLogout.onclick = logout;
+
+    updateUserUI();
+</script>
+</body>
+</html>

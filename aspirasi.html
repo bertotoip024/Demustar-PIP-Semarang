@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEM BOX • DEMUSTAR</title>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..800&family=Manrope:wght@300..800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Manrope', system-ui, sans-serif;
+      background: #0b0b0f;
+      color: #f5e6c8;
+      overflow-x: hidden;
+      font-size: 14px;
+    }
+
+    /* Background Orbs */
+    .bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.3;
+      animation: float 20s infinite ease-in-out;
+    }
+    .o1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,215,0,0.45), transparent); top: -150px; left: -150px; }
+    .o2 { width: 450px; height: 450px; background: radial-gradient(circle, rgba(255,215,0,0.4), transparent); bottom: -100px; right: -100px; animation-delay: -5s; }
+    .o3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(255,215,0,0.35), transparent); top: 40%; left: 70%; animation-delay: -10s; }
+    @keyframes float { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px, -30px) scale(1.05); } }
+    .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,215,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,215,0,0.03) 1px, transparent 1px); background-size: 50px 50px; }
+
+    /* Topbar - Center Navbar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 24px;
+      background: rgba(11, 11, 15, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,215,0,0.12);
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: #f5e6c8;
+      flex-shrink: 0;
+    }
+    .brand-logos {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .brand-logos img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid rgba(255,215,0,.18);
+      background: rgba(255,215,0,.05);
+      padding: 2px;
+    }
+    .brand-title {
+      font-family: 'Newsreader', serif;
+      font-style: italic;
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFD700;
+    }
+    .brand-subtitle {
+      font-size: 8px;
+      color: rgba(245, 230, 200, 0.5);
+    }
+    .topnav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 4px 10px;
+      border-radius: 40px;
+      border: 1px solid rgba(255,215,0,0.12);
+      flex: 1;
+      margin: 0 15px;
+    }
+    .topnav a {
+      color: rgba(245, 230, 200, 0.7);
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 40px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .topnav a:hover, .topnav a.active {
+      color: #FFD700;
+      background: rgba(255,215,0,0.08);
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .user-menu {
+      position: relative;
+    }
+    .user-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 40px;
+      border: 1px solid rgba(255,215,0,0.12);
+      background: rgba(255,255,255,0.04);
+      color: #f5e6c8;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 11px;
+    }
+    .user-btn:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: #FFD700;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #FFD700;
+      box-shadow: 0 0 0 3px rgba(255,215,0,0.2);
+    }
+    .chev {
+      opacity: 0.7;
+      transition: transform 0.2s;
+      font-size: 10px;
+    }
+    .user-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 170px;
+      background: rgba(20,20,28,0.95);
+      border: 1px solid rgba(255,215,0,0.12);
+      border-radius: 12px;
+      backdrop-filter: blur(12px);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 200;
+    }
+    .user-menu.open .user-dropdown { display: flex; }
+    .dd-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      text-decoration: none;
+      color: #f5e6c8;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 12px;
+    }
+    .dd-item:hover { background: rgba(255,215,0,0.08); }
+    .dd-item.danger { color: #ff5a7a; }
+    .dd-ico {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.06);
+      font-size: 12px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 40px;
+      background: linear-gradient(135deg, #FFD700, #b8860b);
+      color: #1a1a1a;
+      font-weight: 800;
+      text-decoration: none;
+      font-size: 11px;
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255,215,0,0.3);
+    }
+
+    /* Main Content */
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 30px 20px 50px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero {
+      text-align: center;
+      padding: 40px 20px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(255,215,0,0.08), transparent 60%);
+      border-radius: 24px;
+      margin-bottom: 40px;
+    }
+    .hero-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 40px;
+      background: rgba(255,215,0,0.08);
+      border: 1px solid rgba(255,215,0,0.2);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #FFD700;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: 'Newsreader', serif;
+      font-style: italic;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .hero h1 .gold { color: #FFD700; }
+    .hero-desc {
+      font-size: 13px;
+      color: rgba(245, 230, 200, 0.7);
+      max-width: 600px;
+      margin: 0 auto 24px;
+      line-height: 1.5;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .stat-number {
+      display: block;
+      font-size: 28px;
+      font-weight: 800;
+      color: #FFD700;
+      font-family: 'Newsreader', serif;
+    }
+    .stat-label {
+      font-size: 10px;
+      color: rgba(245, 230, 200, 0.5);
+    }
+
+    /* Form */
+    .form-section { margin-bottom: 50px; }
+    .section-header { text-align: center; margin-bottom: 28px; }
+    .section-header h2 {
+      font-family: 'Newsreader', serif;
+      font-style: italic;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .section-desc { color: rgba(245, 230, 200, 0.7); font-size: 12px; }
+    .form-card {
+      background: rgba(20, 20, 28, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,215,0,0.12);
+      border-radius: 20px;
+      padding: 28px;
+      max-width: 700px;
+      margin: 0 auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: rgba(245, 230, 200, 0.7);
+    }
+    .required { color: #ff5a7a; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,215,0,0.12);
+      background: rgba(0,0,0,0.3);
+      color: #f5e6c8;
+      font-family: inherit;
+      font-size: 13px;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: #FFD700;
+    }
+    .checkbox-inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 16px 0;
+      cursor: pointer;
+      color: rgba(245, 230, 200, 0.7);
+      font-size: 12px;
+    }
+    .checkbox-inline input { width: 16px; height: 16px; cursor: pointer; accent-color: #FFD700; }
+    .form-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .btn-submit {
+      padding: 10px 24px;
+      border-radius: 40px;
+      background: linear-gradient(135deg, #FFD700, #b8860b);
+      border: none;
+      color: #1a1a1a;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(255,215,0,0.3); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .form-status { font-size: 11px; color: rgba(245, 230, 200, 0.5); }
+    .form-status.ok { color: #88d982; }
+    .form-status.err { color: #ff5a7a; }
+
+    /* Kategori Grid */
+    .kategori-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: rgba(245, 230, 200, 0.7);
+    }
+    .kategori-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 600px) { .kategori-grid { grid-template-columns: repeat(2, 1fr); } }
+    .kat-item { position: relative; }
+    .kat-item input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+    .kat-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,215,0,.18);
+      background: rgba(0,0,0,.25);
+      color: rgba(245, 230, 200, 0.7);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .kat-chip .kat-ico { font-size: 14px; flex-shrink: 0; }
+    .kat-chip .kat-check {
+      width: 16px;
+      height: 16px;
+      border-radius: 5px;
+      border: 1.5px solid rgba(255,215,0,.30);
+      background: rgba(0,0,0,.20);
+      margin-left: auto;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+    .kat-chip:hover {
+      border-color: rgba(255,215,0,.40);
+      background: rgba(255,215,0,.06);
+      color: #f5e6c8;
+    }
+    .kat-item input:checked + .kat-chip {
+      border-color: #FFD700;
+      background: rgba(255,215,0,.12);
+      color: #FFD700;
+      box-shadow: 0 0 0 2px rgba(255,215,0,.15);
+    }
+    .kat-item input:checked + .kat-chip .kat-check {
+      background: #FFD700;
+      border-color: #FFD700;
+      color: #1a1200;
+    }
+    .kat-item input:checked + .kat-chip .kat-check::after {
+      content: "✓";
+      font-weight: 900;
+    }
+    .kat-selected-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .kat-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255,215,0,.12);
+      border: 1px solid rgba(255,215,0,.30);
+      color: #FFD700;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .kat-count {
+      display: inline-block;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #FFD700;
+      color: #1a1200;
+      font-size: 10px;
+      font-weight: 900;
+      text-align: center;
+      line-height: 18px;
+      margin-left: 4px;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid rgba(255,215,0,0.12);
+      background: rgba(11,11,15,0.8);
+      margin-top: 50px;
+      padding: 30px 0;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .footer-title {
+      font-family: 'Newsreader', serif;
+      font-style: italic;
+      font-weight: 700;
+      color: #FFD700;
+      font-size: 14px;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-links a {
+      color: rgba(245, 230, 200, 0.5);
+      text-decoration: none;
+      font-size: 10px;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #FFD700; }
+    .footer-copy { font-size: 9px; color: rgba(245, 230, 200, 0.5); }
+
+    @media (max-width: 900px) {
+      .topbar { flex-direction: column; align-items: center; justify-content: center; padding: 10px 16px; }
+      .topnav { width: 100%; justify-content: center; overflow-x: auto; margin: 8px 0; flex-wrap: wrap; }
+      .topnav a { white-space: nowrap; }
+      .topbar-actions { justify-content: center; margin-top: 5px; }
+      .hero h1 { font-size: 28px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .page { padding: 20px 16px 40px; }
+      .hero { padding: 30px 16px; }
+      .hero-stats { gap: 24px; }
+      .hero h1 { font-size: 24px; }
+      .hero-desc { font-size: 11px; }
+      .section-header h2 { font-size: 22px; }
+      .form-card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+  <div class="grid"></div>
+</div>
+
+<header class="topbar">
+  <a class="brand" href="./index.html">
+    <div class="brand-logos">
+      <img src="./assets/logo-demustar.png" alt="DEMUSTAR" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2218%22 fill=%22none%22 stroke=%22%23FFD700%22 stroke-width=%222%22/%3E%3Ctext x=%2220%22 y=%2225%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22%23FFD700%22%3ED%3C/text%3E%3C/svg%3E'">
+      <img src="./assets/logo-pip.png" alt="PIP Semarang" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2218%22 fill=%22none%22 stroke=%22%23FFD700%22 stroke-width=%222%22/%3E%3Ctext x=%2220%22 y=%2225%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22%23FFD700%22%3EP%3C/text%3E%3C/svg%3E'">
+    </div>
+    <div class="brand-text">
+      <div class="brand-title">DEMUSTAR</div>
+      <div class="brand-subtitle">Politeknik Ilmu Pelayaran Semarang</div>
+    </div>
+  </a>
+
+  <nav class="topnav">
+    <a href="./index.html">Beranda</a>
+    <a href="./aspirasi.html" class="active">DEM BOX</a>
+    <a href="./prestasi.html">Prestasi</a>
+    <a href="./demclass.html">DEM CLASS</a>
+    <a href="./index.html#tentang">Tentang</a>
+    <a href="./index.html#visi">Visi & Misi</a>
+    <a href="./pemilihan.html">Pemilihan</a>
+  </nav>
+
+  <div class="topbar-actions">
+    <div class="user-menu" id="userMenu">
+      <button class="user-btn" id="userBtn" type="button">
+        <span class="dot"></span>
+        <span>Halo,</span>
+        <b id="userName">Guest</b>
+        <span class="chev">▾</span>
+      </button>
+      <div class="user-dropdown" id="userDropdown">
+        <a class="dd-item" id="loginLink" href="./login.html"><span class="dd-ico">👤</span><span>Login</span></a>
+        <a class="dd-item" id="profileLink" href="./profile.html" style="display: none;"><span class="dd-ico">👤</span><span>Profil</span></a>
+        <button class="dd-item danger" id="btnLogout" style="display: none;"><span class="dd-ico">🚪</span><span>Logout</span></button>
+      </div>
+    </div>
+    <a class="btn-primary" href="#kirim-aspirasi">+ Kirim ke DEM BOX</a>
+  </div>
+</header>
+
+<main class="page">
+  <section class="hero">
+    <span class="hero-badge">SUARA TARUNA</span>
+    <h1><span class="gold">DEM BOX</span> — Suara Kamu, Panggung Prestasi Kamu.</h1>
+    <p class="hero-desc">Sampaikan ide, kritik, dan saran untuk kemajuan bersama. Aspirasi Anda akan kami tindak lanjuti dengan transparan dan bertanggung jawab.</p>
+    <div class="hero-stats">
+      <div class="stat-item"><span class="stat-number" id="statPending">0</span><span class="stat-label">Menunggu Verifikasi</span></div>
+      <div class="stat-item"><span class="stat-number" id="statProses">0</span><span class="stat-label">Sedang Diproses</span></div>
+      <div class="stat-item"><span class="stat-number" id="statSelesai">0</span><span class="stat-label">Selesai</span></div>
+    </div>
+  </section>
+
+  <section class="form-section" id="kirim-aspirasi">
+    <div class="section-header">
+      <h2>Kirim ke <span style="color:#FFD700">DEM BOX</span></h2>
+      <p class="section-desc">Isi formulir di bawah. Centang anonim jika ingin menyembunyikan identitas.</p>
+    </div>
+
+    <div class="form-card">
+      <form id="aspirasiForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nama (opsional)</label>
+            <input type="text" id="namaInput" placeholder="Nama lengkap">
+          </div>
+          <div class="form-group">
+            <label>NIT / Kontak (opsional)</label>
+            <input type="text" id="kontakInput" placeholder="NIT / WhatsApp / Email">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="kategori-label">Kategori <span class="required">*</span><span class="kat-count" id="katCount" style="display:none;">0</span></label>
+          <div class="kategori-grid">
+            <label class="kat-item"><input type="checkbox" name="kategori" value="Akademik"><span class="kat-chip"><span class="kat-ico">📚</span><span>Akademik</span><span class="kat-check"></span></span></label>
+            <label class="kat-item"><input type="checkbox" name="kategori" value="Fasilitas"><span class="kat-chip"><span class="kat-ico">🏢</span><span>Fasilitas</span><span class="kat-check"></span></span></label>
+            <label class="kat-item"><input type="checkbox" name="kategori" value="Kedisiplinan"><span class="kat-chip"><span class="kat-ico">⚖️</span><span>Kedisiplinan</span><span class="kat-check"></span></span></label>
+            <label class="kat-item"><input type="checkbox" name="kategori" value="Kegiatan"><span class="kat-chip"><span class="kat-ico">🎉</span><span>Kegiatan</span><span class="kat-check"></span></span></label>
+            <label class="kat-item"><input type="checkbox" name="kategori" value="Kesejahteraan"><span class="kat-chip"><span class="kat-ico">💝</span><span>Kesejahteraan</span><span class="kat-check"></span></span></label>
+            <label class="kat-item"><input type="checkbox" name="kategori" value="Lainnya"><span class="kat-chip"><span class="kat-ico">📝</span><span>Lainnya</span><span class="kat-check"></span></span></label>
+          </div>
+          <p class="kategori-hint" style="font-size:10px; color:rgba(245,230,200,0.5); margin-top:6px;">Pilih satu atau lebih kategori yang sesuai dengan aspirasimu.</p>
+          <div class="kat-selected-tags" id="katTags"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Aspirasi <span class="required">*</span></label>
+          <textarea id="aspirasiText" rows="4" placeholder="Tulis aspirasi Anda di sini... Minimal 10 karakter."></textarea>
+        </div>
+
+        <label class="checkbox-inline">
+          <input type="checkbox" id="anonimCheckbox">
+          <span>✓ Kirim sebagai anonim (nama & kontak tidak akan ditampilkan)</span>
+        </label>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" id="submitBtn">Kirim ke DEM BOX</button>
+          <span class="form-status" id="aspirasiStatus"></span>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <span class="footer-title">DEMUSTAR</span>
+    <div class="footer-links"><a href="#">Tentang Kami</a><a href="#">Kebijakan Privasi</a><a href="#">Kontak</a></div>
+    <p class="footer-copy">© 2026 DEMUSTAR. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<script>
+  // DOM Elements
+  const userMenu = document.getElementById('userMenu');
+  const userBtn = document.getElementById('userBtn');
+  const userName = document.getElementById('userName');
+  const loginLink = document.getElementById('loginLink');
+  const profileLink = document.getElementById('profileLink');
+  const btnLogout = document.getElementById('btnLogout');
+
+  const aspirasiForm = document.getElementById('aspirasiForm');
+  const aspirasiStatus = document.getElementById('aspirasiStatus');
+  const submitBtn = document.getElementById('submitBtn');
+  const anonimCheckbox = document.getElementById('anonimCheckbox');
+  const namaInput = document.getElementById('namaInput');
+  const kontakInput = document.getElementById('kontakInput');
+  const aspirasiText = document.getElementById('aspirasiText');
+
+  // Toast Notification
+  function showToast(type, message) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'toast';
+      document.body.appendChild(toast);
+    }
+    toast.style.cssText = `position:fixed; bottom:20px; right:20px; padding:12px 24px; border-radius:8px; background:${type === 'success' ? '#28a745' : '#dc3545'}; color:white; font-size:14px; z-index:1000; transition:all 0.3s ease; transform:translateX(400px);`;
+    toast.textContent = message;
+    toast.style.transform = 'translateX(0)';
+    setTimeout(() => { toast.style.transform = 'translateX(400px)'; }, 3000);
+  }
+
+  // Load Stats
+  async function loadStats() {
+    try {
+      const res = await fetch('/demustar/api/aspirasi.php');
+      const result = await res.json();
+      if (result.ok && result.stats) {
+        document.getElementById('statPending').textContent = result.stats.pending || 0;
+        document.getElementById('statProses').textContent = result.stats.proses || 0;
+        document.getElementById('statSelesai').textContent = result.stats.selesai || 0;
+      }
+    } catch(e) { console.error('Error loading stats:', e); }
+  }
+
+  // Update User UI
+  async function updateUserUI() {
+    const welcomeData = sessionStorage.getItem('demustar_welcome');
+    if (welcomeData) {
+      try { const data = JSON.parse(welcomeData); if (data && data.name) { userName.textContent = data.name; loginLink.style.display = 'none'; profileLink.style.display = 'flex'; btnLogout.style.display = 'flex'; return; } } catch(e) {}
+    }
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try { const user = JSON.parse(userStr); if (user && user.nama) { userName.textContent = user.nama; loginLink.style.display = 'none'; profileLink.style.display = 'flex'; btnLogout.style.display = 'flex'; return; } } catch(e) {}
+    }
+    try {
+      const res = await fetch('/demustar/api/auth/me.php', { credentials: 'same-origin' });
+      const data = await res.json();
+      if (res.ok && data.ok && data.user) {
+        const name = data.user.nama || data.user.nit || 'User';
+        userName.textContent = name;
+        loginLink.style.display = 'none';
+        profileLink.style.display = 'flex';
+        btnLogout.style.display = 'flex';
+        return;
+      }
+    } catch(e) {}
+    userName.textContent = 'Guest';
+    loginLink.style.display = 'flex';
+    profileLink.style.display = 'none';
+    btnLogout.style.display = 'none';
+  }
+
+  async function logout() {
+    try { await fetch('/demustar/api/auth/logout.php', { method: 'POST', credentials: 'same-origin' }); } catch(e) {}
+    sessionStorage.removeItem('demustar_welcome');
+    localStorage.removeItem('user');
+    localStorage.removeItem('isLoggedIn');
+    window.location.href = './index.html';
+  }
+
+  // Multi-Select Kategori
+  const katCheckboxes = document.querySelectorAll('input[name="kategori"]');
+  const katCount = document.getElementById('katCount');
+  const katTags = document.getElementById('katTags');
+  const katIcons = { 'Akademik': '📚', 'Fasilitas': '🏢', 'Kedisiplinan': '⚖️', 'Kegiatan': '🎉', 'Kesejahteraan': '💝', 'Lainnya': '📝' };
+  
+  function updateKatUI() {
+    const selected = [...katCheckboxes].filter(c => c.checked).map(c => c.value);
+    if (katCount) { katCount.textContent = selected.length; katCount.style.display = selected.length > 0 ? 'inline-block' : 'none'; }
+    if (katTags) katTags.innerHTML = selected.map(v => `<span class="kat-tag">${katIcons[v] || '🏷️'} ${v}</span>`).join('');
+  }
+  katCheckboxes.forEach(cb => cb.addEventListener('change', updateKatUI));
+
+  // Anonim checkbox
+  if (anonimCheckbox) {
+    anonimCheckbox.addEventListener('change', () => {
+      const isAnon = anonimCheckbox.checked;
+      if (namaInput) { namaInput.disabled = isAnon; if (isAnon) namaInput.value = ''; }
+      if (kontakInput) { kontakInput.disabled = isAnon; if (isAnon) kontakInput.value = ''; }
+    });
+  }
+
+  // Submit Form
+  if (aspirasiForm) {
+    aspirasiForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const kategoriList = [...katCheckboxes].filter(c => c.checked).map(c => c.value);
+      if (kategoriList.length === 0) {
+        aspirasiStatus.textContent = '⚠ Pilih minimal satu kategori.';
+        aspirasiStatus.className = 'form-status err';
+        return;
+      }
+
+      const isi = (aspirasiText?.value || '').trim();
+      if (isi.length < 10) {
+        aspirasiStatus.textContent = '⚠ Aspirasi minimal 10 karakter.';
+        aspirasiStatus.className = 'form-status err';
+        return;
+      }
+
+      const payload = {
+        nama: (namaInput?.value || '').trim(),
+        kontak: (kontakInput?.value || '').trim(),
+        kategori: kategoriList.join(', '),
+        isi: isi,
+        anonim: anonimCheckbox?.checked || false,
+      };
+
+      aspirasiStatus.textContent = 'Mengirim...';
+      aspirasiStatus.className = 'form-status muted';
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/demustar/api/aspirasi.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload)
+        });
+        
+        const result = await res.json();
+
+        if (result.ok) {
+          aspirasiStatus.textContent = '✓ Aspirasi berhasil dikirim ke DEM BOX!';
+          aspirasiStatus.className = 'form-status ok';
+          aspirasiForm.reset();
+          katCheckboxes.forEach(c => c.checked = false);
+          updateKatUI();
+          if (namaInput) namaInput.disabled = false;
+          if (kontakInput) kontakInput.disabled = false;
+          if (anonimCheckbox) anonimCheckbox.checked = false;
+          if (aspirasiText) aspirasiText.value = '';
+          loadStats();
+          showToast('success', 'Aspirasi berhasil dikirim!');
+        } else {
+          aspirasiStatus.textContent = '✗ ' + (result.message || 'Gagal mengirim aspirasi.');
+          aspirasiStatus.className = 'form-status err';
+          showToast('error', result.message || 'Gagal mengirim aspirasi');
+        }
+      } catch (err) {
+        aspirasiStatus.textContent = '✗ Terjadi kesalahan. Periksa koneksi Anda.';
+        aspirasiStatus.className = 'form-status err';
+        showToast('error', 'Gagal terhubung ke server');
+      } finally {
+        submitBtn.disabled = false;
+        setTimeout(() => {
+          aspirasiStatus.textContent = '';
+          aspirasiStatus.className = 'form-status';
+        }, 4000);
+      }
+    });
+  }
+
+  // User dropdown
+  if (userBtn && userMenu) {
+    userBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); userMenu.classList.toggle('open'); });
+    document.addEventListener('click', (e) => { if (!userMenu.contains(e.target)) userMenu.classList.remove('open'); });
+  }
+  if (btnLogout) btnLogout.addEventListener('click', logout);
+
+  // Initialize
+  updateUserUI();
+  loadStats();
+</script>
+</body>
+</html>

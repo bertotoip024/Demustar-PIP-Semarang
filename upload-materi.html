@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Materi - Nautika</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Manrope', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0b0b0f 0%, #131318 100%);
+            color: #f5e6c8;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+        
+        .card {
+            background: rgba(20, 20, 28, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 215, 0, 0.12);
+            border-radius: 24px;
+            padding: 32px;
+        }
+        
+        h1 {
+            font-family: 'Newsreader', serif;
+            font-style: italic;
+            font-size: 36px;
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            color: rgba(245, 230, 200, 0.6);
+            margin-bottom: 32px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #FFD700;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            color: #f5e6c8;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #FFD700;
+            background: rgba(255, 215, 0, 0.05);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .file-upload {
+            border: 2px dashed rgba(255, 215, 0, 0.3);
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload:hover {
+            border-color: #FFD700;
+            background: rgba(255, 215, 0, 0.05);
+        }
+        
+        .file-upload input {
+            display: none;
+        }
+        
+        .file-info {
+            margin-top: 12px;
+            font-size: 12px;
+            color: rgba(245, 230, 200, 0.5);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #FFD700, #b8860b);
+            color: #1a1a1a;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 40px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 16px;
+            display: none;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #FFD700;
+            transition: width 0.3s;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        
+        .alert-success {
+            background: rgba(136, 217, 130, 0.2);
+            border: 1px solid #88d982;
+            color: #88d982;
+        }
+        
+        .alert-error {
+            background: rgba(255, 90, 122, 0.2);
+            border: 1px solid #ff5a7a;
+            color: #ff5a7a;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 16px;
+            }
+            .card {
+                padding: 24px;
+            }
+            h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>📚 Upload Materi Ajar</h1>
+            <p class="subtitle">Bagikan pengetahuan Nautika kepada taruna</p>
+            
+            <div id="alert" class="alert"></div>
+            
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Judul Materi *</label>
+                    <input type="text" name="judul" required placeholder="Contoh: Navigasi Darat & Laut - Bab 1">
+                </div>
+                
+                <div class="form-group">
+                    <label>Bab / Kategori *</label>
+                    <select name="bab" required>
+                        <option value="">Pilih Bab</option>
+                        <option value="Navigasi">🧭 Navigasi</option>
+                        <option value="Meteorologi">🌤️ Meteorologi Maritim</option>
+                        <option value="Ilmu Pelayaran">⚓ Ilmu Pelayaran</option>
+                        <option value="Komunikasi">📡 Komunikasi Kapal</option>
+                        <option value="Keselamatan">🆘 Keselamatan Pelayaran</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Deskripsi</label>
+                    <textarea name="deskripsi" placeholder="Jelaskan materi yang akan dipelajari..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>File Materi *</label>
+                    <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                        <div>📁 Klik atau drag & drop file disini</div>
+                        <div class="file-info">Support: PDF, Video (MP4), PPT, DOC, dan lainnya (Max 50MB)</div>
+                        <input type="file" name="file" id="fileInput" accept=".pdf,.mp4,.ppt,.pptx,.doc,.docx">
+                    </div>
+                    <div id="fileName" class="file-info"></div>
+                </div>
+                
+                <input type="hidden" name="created_by" value="1"> <!-- Ganti dengan ID user yang login -->
+                
+                <button type="submit">🚀 Upload Materi</button>
+                
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        const form = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const alertDiv = document.getElementById('alert');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        
+        fileInput.addEventListener('change', function() {
+            if(this.files[0]) {
+                fileName.textContent = `📄 ${this.files[0].name} (${(this.files[0].size / 1024 / 1024).toFixed(2)} MB)`;
+            }
+        });
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            
+            alertDiv.style.display = 'none';
+            progressBar.style.display = 'block';
+            progressFill.style.width = '0%';
+            
+            try {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'api/materi.php', true);
+                
+                xhr.upload.onprogress = (event) => {
+                    if(event.lengthComputable) {
+                        const percent = (event.loaded / event.total) * 100;
+                        progressFill.style.width = percent + '%';
+                    }
+                };
+                
+                xhr.onload = () => {
+                    progressBar.style.display = 'none';
+                    const response = JSON.parse(xhr.responseText);
+                    
+                    if(response.success) {
+                        showAlert('success', '✅ Materi berhasil diupload! Halaman akan refresh...');
+                        setTimeout(() => {
+                            window.location.href = 'beranda-nautika.html';
+                        }, 2000);
+                    } else {
+                        showAlert('error', '❌ Gagal upload: ' + response.message);
+                    }
+                };
+                
+                xhr.onerror = () => {
+                    progressBar.style.display = 'none';
+                    showAlert('error', '❌ Terjadi kesalahan koneksi');
+                };
+                
+                xhr.send(formData);
+            } catch(error) {
+                progressBar.style.display = 'none';
+                showAlert('error', '❌ Error: ' + error.message);
+            }
+        });
+        
+        function showAlert(type, message) {
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertDiv.style.display = 'block';
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

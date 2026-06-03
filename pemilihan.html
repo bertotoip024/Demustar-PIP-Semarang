@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemilihan Top 4 • DEMUSTAR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..800&family=Manrope:wght@300..800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0b0f;
+            --bg2: #131318;
+            --surface: rgba(20, 20, 28, 0.85);
+            --surface2: rgba(30, 30, 38, 0.9);
+            --gold: #FFD700;
+            --gold-faint: rgba(255, 215, 0, 0.08);
+            --green: #88d982;
+            --blue: #4f8cff;
+            --red: #ff5a7a;
+            --text: #f5e6c8;
+            --muted: rgba(245, 230, 200, 0.7);
+            --muted2: rgba(245, 230, 200, 0.5);
+            --line: rgba(255, 215, 0, 0.12);
+            --radius: 16px;
+            --radius-lg: 24px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Manrope', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            font-size: 14px;
+        }
+        .bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; animation: float 20s infinite ease-in-out; }
+        .o1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,215,0,0.45), transparent); top: -150px; left: -150px; }
+        .o2 { width: 450px; height: 450px; background: radial-gradient(circle, rgba(255,215,0,0.4), transparent); bottom: -100px; right: -100px; animation-delay: -5s; }
+        .o3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(255,215,0,0.35), transparent); top: 40%; left: 70%; animation-delay: -10s; }
+        @keyframes float { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px, -30px) scale(1.05); } }
+        .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,215,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,215,0,0.03) 1px, transparent 1px); background-size: 50px 50px; }
+        
+        /* Topbar - Center Navbar */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px;
+            background: rgba(11, 11, 15, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--line);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .brand-logos {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .brand-logos img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,.18);
+            background: rgba(255,215,0,.05);
+            padding: 2px;
+        }
+        .brand-title {
+            font-family: 'Newsreader', serif;
+            font-style: italic;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 0.5px;
+        }
+        .brand-subtitle {
+            font-size: 8px;
+            color: var(--muted2);
+            letter-spacing: 0.3px;
+        }
+        .topnav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.03);
+            padding: 4px 10px;
+            border-radius: 40px;
+            border: 1px solid var(--line);
+            flex: 1;
+            margin: 0 15px;
+        }
+        .topnav a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 40px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .topnav a:hover, .topnav a.active {
+            color: var(--gold);
+            background: var(--gold-faint);
+        }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .user-menu { position: relative; }
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 40px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .user-btn:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--gold);
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255,215,0,0.2);
+        }
+        .chev {
+            opacity: 0.7;
+            transition: transform 0.2s;
+            font-size: 10px;
+        }
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 200px;
+            background: rgba(20,20,28,0.95);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            backdrop-filter: blur(12px);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 200;
+        }
+        .user-menu.open .user-dropdown { display: flex; }
+        .dd-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            text-decoration: none;
+            color: var(--text);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 12px;
+        }
+        .dd-item:hover { background: var(--gold-faint); }
+        .dd-item.danger { color: var(--red); }
+        .dd-ico {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.06);
+            font-size: 12px;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 40px;
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            color: #1a1a1a;
+            font-weight: 800;
+            text-decoration: none;
+            font-size: 11px;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,215,0,0.3); }
+        
+        .page { max-width: 1100px; margin: 0 auto; padding: 30px 20px 50px; position: relative; z-index: 1; }
+        .hero { text-align: center; padding: 35px 20px; background: radial-gradient(ellipse at 50% 0%, rgba(255,215,0,0.08), transparent 60%); border-radius: var(--radius-lg); margin-bottom: 35px; }
+        .hero-badge { display: inline-block; padding: 4px 12px; border-radius: 40px; background: var(--gold-faint); border: 1px solid rgba(255,215,0,0.2); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+        .hero h1 { font-family: 'Newsreader', serif; font-style: italic; font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+        .hero h1 .gold { color: var(--gold); }
+        .hero-desc { font-size: 13px; color: var(--muted); max-width: 600px; margin: 0 auto; line-height: 1.5; }
+        
+        .card { background: var(--surface2); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; }
+        .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; gap: 10px; }
+        .card-head h2 { font-size: 20px; color: var(--gold); }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 40px; background: var(--gold-faint); border: 1px solid rgba(255,215,0,0.2); font-size: 10px; color: var(--gold); }
+        .badge.good { background: rgba(136,217,130,0.15); border-color: rgba(136,217,130,0.3); color: var(--green); }
+        .badge.bad { background: rgba(255,90,122,0.15); border-color: rgba(255,90,122,0.3); color: var(--red); }
+        
+        .voter-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px; }
+        @media (max-width: 768px) { .voter-grid { grid-template-columns: repeat(2, 1fr); } }
+        .v-item { background: rgba(255,255,255,0.03); border-radius: var(--radius); padding: 12px; border: 1px solid var(--line); }
+        .k { font-size: 9px; text-transform: uppercase; color: var(--muted2); margin-bottom: 6px; }
+        .v { font-size: 14px; font-weight: 600; }
+        
+        .tools { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+        .tools input, .tools select { padding: 8px 14px; border-radius: 40px; border: 1px solid var(--line); background: rgba(0,0,0,0.3); color: var(--text); font-size: 12px; }
+        
+        .grid-candidates { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+        @media (max-width: 900px) { .grid-candidates { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .grid-candidates { grid-template-columns: 1fr; } }
+        
+        .candidate { background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.04)); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; transition: all 0.3s; }
+        .candidate:hover { transform: translateY(-4px); border-color: var(--gold); }
+        .candidate.picked { border: 2px solid var(--gold); background: rgba(255,215,0,0.1); }
+        .cover { height: 110px; background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05)); position: relative; }
+        .cover div { position: absolute; bottom: -20px; left: 12px; width: 60px; height: 60px; border-radius: 14px; background: #FFD700; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .body { padding: 24px 12px 12px; }
+        .name { font-size: 16px; font-weight: 700; color: var(--gold); margin-bottom: 4px; }
+        .meta { font-size: 10px; color: var(--muted2); margin-bottom: 10px; }
+        .vm { font-size: 11px; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+        .actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+        .pill { font-size: 10px; padding: 3px 8px; border-radius: 40px; background: var(--gold-faint); color: var(--gold); }
+        .btn { padding: 6px 16px; border-radius: 40px; font-weight: 700; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+        .btn.primary { background: linear-gradient(135deg, var(--gold), #b8860b); color: #1a1a1a; border: none; }
+        .btn.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .backdrop.show { display: flex; }
+        .modal { background: var(--surface2); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px; max-width: 350px; width: 90%; text-align: center; }
+        .modal h3 { font-size: 20px; color: var(--gold); margin-bottom: 12px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+        .btn.ghost { background: transparent; border: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+        
+        .footer { border-top: 1px solid var(--line); background: rgba(11,11,15,0.8); margin-top: 50px; padding: 30px 0; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .footer-brand { display: flex; align-items: center; gap: 8px; }
+        .footer-brand img { width: 24px; height: 24px; object-fit: contain; border-radius: 5px; }
+        .footer-title { font-family: 'Newsreader', serif; font-style: italic; font-weight: 700; color: var(--gold); font-size: 14px; }
+        .footer-links { display: flex; gap: 24px; }
+        .footer-links a { color: var(--muted2); text-decoration: none; font-size: 10px; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--gold); }
+        .footer-copy { font-size: 9px; color: var(--muted2); }
+        
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; border-radius: 8px; color: white; font-size: 12px; z-index: 1000; transition: all 0.3s ease; transform: translateX(400px); }
+        
+        @media (max-width: 900px) {
+            .topbar { flex-direction: column; align-items: center; justify-content: center; padding: 10px 16px; }
+            .topnav { width: 100%; justify-content: center; overflow-x: auto; margin: 8px 0; }
+            .topnav a { white-space: nowrap; }
+            .topbar-actions { justify-content: center; margin-top: 5px; }
+            .hero h1 { font-size: 28px; }
+            .grid-candidates { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .page { padding: 20px 16px 40px; }
+            .hero { padding: 25px 16px; }
+            .hero h1 { font-size: 24px; }
+            .hero-desc { font-size: 11px; }
+            .grid-candidates { grid-template-columns: 1fr; }
+            .voter-grid { grid-template-columns: 1fr; }
+            .card-head h2 { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div class="grid"></div></div>
+
+<header class="topbar">
+    <a class="brand" href="./index.html">
+        <div class="brand-logos">
+            <img src="./assets/logo-demustar.png" alt="DEMUSTAR"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2218%22 fill=%22none%22 stroke=%22%23FFD700%22 stroke-width=%222%22/%3E%3Ctext x=%2220%22 y=%2225%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22%23FFD700%22%3ED%3C/text%3E%3C/svg%3E'">
+            <img src="./assets/logo-pip.png" alt="PIP Semarang"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2218%22 fill=%22none%22 stroke=%22%23FFD700%22 stroke-width=%222%22/%3E%3Ctext x=%2220%22 y=%2225%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22%23FFD700%22%3EP%3C/text%3E%3C/svg%3E'">
+        </div>
+        <div class="brand-text">
+            <div class="brand-title">DEMUSTAR</div>
+            <div class="brand-subtitle">Politeknik Ilmu Pelayaran Semarang</div>
+        </div>
+    </a>
+
+    <nav class="topnav">
+        <a href="./index.html">Beranda</a>
+        <a href="./aspirasi.html">DEM BOX</a>
+        <a href="./prestasi.html">Prestasi</a>
+        <a href="./demclass.html">DEM CLASS</a>
+        <a href="./index.html#tentang">Tentang</a>
+        <a href="./index.html#visi">Visi & Misi</a>
+        <a href="./pemilihan.html" class="active">Pemilihan</a>
+    </nav>
+
+    <div class="topbar-actions">
+        <div class="user-menu" id="userMenu">
+            <button class="user-btn" id="userBtn" type="button">
+                <span class="dot"></span>
+                <span>Halo,</span>
+                <b id="userName">Guest</b>
+                <span class="chev">▾</span>
+            </button>
+            <div class="user-dropdown" id="userDropdown">
+                <a class="dd-item" id="profileLink" href="./profile.html">
+                    <span class="dd-ico">👤</span>
+                    <span>Profil</span>
+                </a>
+                <button class="dd-item danger" id="btnLogout">
+                    <span class="dd-ico">🚪</span>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+        <a class="btn-primary" href="./aspirasi.html">+ Kirim ke DEM BOX</a>
+    </div>
+</header>
+
+<main class="page">
+    <section class="hero">
+        <span class="hero-badge">Pemilihan Top 4</span>
+        <h1>Pilih <span class="gold">Pemimpin Masa Depan</span></h1>
+        <p class="hero-desc">Pilih 1 kandidat (1 NIT hanya 1 kali). Suaramu menentukan masa depan DEMUSTAR!</p>
+    </section>
+
+    <div class="card">
+        <div class="card-head"><h2>Identitas Pemilih</h2><span class="badge" id="voteBadge">—</span></div>
+        <div class="voter-grid">
+            <div class="v-item"><div class="k">Nama</div><div class="v" id="vNama">Guest</div></div>
+            <div class="v-item"><div class="k">NIT</div><div class="v" id="vNit">—</div></div>
+            <div class="v-item"><div class="k">Tanggal Lahir</div><div class="v" id="vDob">—</div></div>
+            <div class="v-item"><div class="k">Status</div><div class="v" id="vStatus">Belum login</div></div>
+        </div>
+        <div class="notice" id="voteNotice"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-head"><h2>Kandidat</h2></div>
+        <div class="tools">
+            <input type="text" id="searchInput" placeholder="Cari kandidat...">
+            <select id="sortSelect">
+                <option value="name_asc">Nama (A-Z)</option>
+                <option value="name_desc">Nama (Z-A)</option>
+            </select>
+        </div>
+        <div class="grid-candidates" id="candidateList">
+            <div class="loading">⏳ Memuat kandidat...</div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <img src="./assets/logo-demustar.png" alt="DEMUSTAR">
+            <span class="footer-title">DEMUSTAR</span>
+        </div>
+        <div class="footer-links">
+            <a href="#">Tentang Kami</a>
+            <a href="#">Kebijakan Privasi</a>
+            <a href="#">Kontak</a>
+        </div>
+        <p class="footer-copy">© 2026 DEMUSTAR. ALL RIGHTS RESERVED.</p>
+    </div>
+</footer>
+
+<div class="backdrop" id="modalBackdrop">
+    <div class="modal">
+        <h3>Konfirmasi Pilihan</h3>
+        <p id="modalText">Apakah Anda yakin ingin memilih kandidat ini?</p>
+        <div class="modal-actions">
+            <button class="btn ghost" id="cancelBtn">Batal</button>
+            <button class="btn primary" id="confirmBtn">Ya, Pilih</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========== VARIABEL ==========
+    let candidates = [];
+    let currentUser = null;
+    let selectedCandidate = null;
+    let hasVoted = false;
+    let votedCandidateId = null;
+    
+    // ========== DOM ELEMENTS ==========
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    const candidateList = document.getElementById('candidateList');
+    const vNama = document.getElementById('vNama');
+    const vNit = document.getElementById('vNit');
+    const vDob = document.getElementById('vDob');
+    const vStatus = document.getElementById('vStatus');
+    const voteBadge = document.getElementById('voteBadge');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const modalText = document.getElementById('modalText');
+    const userName = document.getElementById('userName');
+    const profileLink = document.getElementById('profileLink');
+    const btnLogout = document.getElementById('btnLogout');
+    const userMenu = document.getElementById('userMenu');
+    const userBtn = document.getElementById('userBtn');
+    const userDropdown = document.getElementById('userDropdown');
+    
+    // ========== FUNGSI ==========
+    function showToast(type, message) {
+        let toast = document.querySelector('.toast');
+        if (!toast) { toast = document.createElement('div'); toast.className = 'toast'; document.body.appendChild(toast); }
+        toast.style.cssText = `position:fixed; bottom:20px; right:20px; padding:10px 20px; border-radius:8px; background:${type === 'success' ? '#28a745' : '#dc3545'}; color:white; z-index:1000; font-size:12px; transition:0.3s; transform:translateX(400px);`;
+        toast.textContent = message;
+        toast.style.transform = 'translateX(0)';
+        setTimeout(() => { toast.style.transform = 'translateX(400px)'; }, 3000);
+    }
+    
+    // ========== LOAD KANDIDAT DARI DATABASE ==========
+    async function loadCandidatesFromDB() {
+        candidateList.innerHTML = '<div class="loading">⏳ Memuat kandidat...</div>';
+        try {
+            const res = await fetch('/demustar/api/kandidat.php');
+            const result = await res.json();
+            if (result.ok && result.data) {
+                candidates = result.data;
+                console.log('Kandidat loaded from DB:', candidates.length);
+                renderCandidates();
+            } else {
+                candidateList.innerHTML = '<div class="empty-data">❌ Gagal memuat kandidat</div>';
+            }
+        } catch(e) {
+            console.error('Error loading candidates:', e);
+            candidateList.innerHTML = '<div class="empty-data">❌ Error: ' + e.message + '</div>';
+        }
+    }
+    
+    // ========== LOAD USER FROM API ==========
+    async function loadUserFromAPI() {
+        try {
+            const res = await fetch('/demustar/api/auth/me.php', { credentials: 'same-origin' });
+            const data = await res.json();
+            if (res.ok && data.ok && data.user) {
+                currentUser = data.user;
+                vNama.textContent = currentUser.nama || 'Guest';
+                vNit.textContent = currentUser.nit || '—';
+                vDob.textContent = currentUser.tanggal_lahir || '—';
+                vStatus.textContent = 'Terdaftar';
+                userName.textContent = currentUser.nama;
+                profileLink.style.display = 'flex';
+                btnLogout.style.display = 'flex';
+                await checkVoteStatus();
+            } else {
+                setGuestUI();
+            }
+        } catch(e) { setGuestUI(); }
+    }
+    
+    function setGuestUI() {
+        currentUser = null;
+        vNama.textContent = 'Guest';
+        vNit.textContent = '—';
+        vDob.textContent = '—';
+        vStatus.textContent = 'Belum login';
+        voteBadge.textContent = '—';
+        voteBadge.classList.remove('good', 'bad');
+        userName.textContent = 'Guest';
+        profileLink.style.display = 'none';
+        btnLogout.style.display = 'none';
+    }
+    
+    async function checkVoteStatus() {
+        if (!currentUser) return;
+        try {
+            const res = await fetch('/demustar/api/vote.php', { credentials: 'same-origin' });
+            const data = await res.json();
+            if (data.ok && data.has_voted) {
+                hasVoted = true;
+                votedCandidateId = data.vote?.kandidat_id;
+                voteBadge.textContent = 'SUDAH MEMILIH';
+                voteBadge.classList.add('good');
+                vStatus.textContent = 'Sudah memilih';
+            } else {
+                hasVoted = false;
+                voteBadge.textContent = 'BELUM MEMILIH';
+                voteBadge.classList.add('bad');
+            }
+            renderCandidates();
+        } catch(e) { console.error('Error checking vote:', e); }
+    }
+    
+    async function submitVote(kandidat_id, kandidat_nama) {
+        try {
+            const res = await fetch('/demustar/api/vote.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ kandidat_id, kandidat_nama })
+            });
+            const data = await res.json();
+            if (data.ok) {
+                hasVoted = true;
+                votedCandidateId = kandidat_id;
+                voteBadge.textContent = 'SUDAH MEMILIH';
+                voteBadge.classList.add('good');
+                vStatus.textContent = 'Sudah memilih';
+                showToast('success', '✅ Vote berhasil disimpan!');
+                renderCandidates();
+                return true;
+            } else {
+                showToast('error', data.message || 'Gagal menyimpan vote');
+                return false;
+            }
+        } catch(e) {
+            showToast('error', 'Terjadi kesalahan');
+            return false;
+        }
+    }
+    
+    function renderCandidates() {
+        let filtered = [...candidates];
+        const search = searchInput.value.toLowerCase();
+        if (search) filtered = filtered.filter(c => c.nama.toLowerCase().includes(search) || c.nit.includes(search));
+        
+        const sort = sortSelect.value;
+        filtered.sort((a, b) => sort === 'name_asc' ? a.nama.localeCompare(b.nama) : b.nama.localeCompare(a.nama));
+        
+        if (filtered.length === 0) {
+            candidateList.innerHTML = '<div class="empty-data">📭 Tidak ada kandidat</div>';
+            return;
+        }
+        
+        candidateList.innerHTML = filtered.map(c => `
+            <div class="candidate ${votedCandidateId === c.id ? 'picked' : ''}">
+                <div class="cover"><div>👤</div></div>
+                <div class="body">
+                    <div class="name">${c.nama}</div>
+                    <div class="meta">${c.id} • NIT: ${c.nit} • Top 4</div>
+                    <div class="vm"><strong>Visi:</strong> ${c.visi}<br><strong>Misi:</strong><br>• ${c.misi ? c.misi.replace(/\n/g, '<br>• ') : '-'}</div>
+                    <div class="actions">
+                        <span class="pill">${votedCandidateId === c.id ? 'Pilihanmu' : ''}</span>
+                        <button class="btn primary" onclick="pilihKandidat('${c.id}', '${c.nama}')" ${!currentUser || hasVoted ? 'disabled' : ''}>${!currentUser ? 'Login dulu' : (hasVoted ? 'Terkunci' : 'Pilih')}</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    window.pilihKandidat = (id, nama) => {
+        if (!currentUser) { showToast('error', 'Silakan login terlebih dahulu'); return; }
+        if (hasVoted) { showToast('error', 'Anda sudah melakukan voting'); return; }
+        selectedCandidate = { id, nama };
+        modalText.textContent = `Kamu yakin memilih ${nama}? Pilihan tidak bisa diubah.`;
+        modalBackdrop.classList.add('show');
+    };
+    
+    confirmBtn.onclick = async () => {
+        if (selectedCandidate) {
+            modalBackdrop.classList.remove('show');
+            await submitVote(selectedCandidate.id, selectedCandidate.nama);
+            selectedCandidate = null;
+        }
+    };
+    cancelBtn.onclick = () => { modalBackdrop.classList.remove('show'); selectedCandidate = null; };
+    modalBackdrop.onclick = (e) => { if (e.target === modalBackdrop) modalBackdrop.classList.remove('show'); };
+    
+    searchInput.addEventListener('input', renderCandidates);
+    sortSelect.addEventListener('change', renderCandidates);
+    
+    userBtn.onclick = (e) => { e.stopPropagation(); userMenu.classList.toggle('open'); };
+    document.addEventListener('click', (e) => { if (!userMenu.contains(e.target)) userMenu.classList.remove('open'); });
+    
+    btnLogout.onclick = async () => {
+        await fetch('/demustar/api/auth/logout.php', { method: 'POST', credentials: 'same-origin' });
+        sessionStorage.clear(); 
+        localStorage.clear(); 
+        window.location.href = './index.html';
+    };
+    
+    // ========== INITIALIZE ==========
+    loadCandidatesFromDB();
+    loadUserFromAPI();
+</script>
+</body>
+</html>
